@@ -1,0 +1,13 @@
+server.port: 8763
+
+# MySQL
+spring.datasource.url: jdbc:mysql://192.168.99.100:3306/readby
+spring.datasource.username: root
+spring.datasource.password: admin
+spring.datasource.driver-class-name: com.mysql.jdbc.Driver
+spring.jpa.database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+security.basic.enable: false
+security.ignored: /**
+
+readby.otp.url: http://localhost:8765/edi/imp2997/publisher
