@@ -44,6 +44,7 @@ class UserDetails implements Serializable{
 
     @Column(name = 'LOGIN_PASSWORD')
     @JsonProperty(value = 'LOGIN_PASSWORD')
+    @JsonIgnore
     private String loginPassword
 
     @Column(name = 'MOBILE_NO')
@@ -72,18 +73,22 @@ class UserDetails implements Serializable{
 
     @Column(name = 'CREATED_AT')
     @JsonProperty(value = 'CREATED_AT')
+    @JsonIgnore
     private Timestamp createdAt = new Timestamp(new Date().getTime())
 
     @Column(name = 'CREATED_BY')
     @JsonProperty(value = 'CREATED_BY')
+    @JsonIgnore
     private String createdBy
 
     @Column(name = 'UPDATED_AT')
     @JsonProperty(value = 'UPDATED_AT')
+    @JsonIgnore
     private Timestamp updatedAt = new Timestamp(new Date().getTime())
 
     @Column(name = 'UPDATED_BY')
     @JsonProperty(value = 'UPDATED_BY')
+    @JsonIgnore
     private String updatedBy
 
     @Column(name = 'DEVICE_ID')
