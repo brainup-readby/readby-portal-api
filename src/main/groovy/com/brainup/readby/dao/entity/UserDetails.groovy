@@ -1,17 +1,11 @@
 package com.brainup.readby.dao.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.Canonical
-import lombok.EqualsAndHashCode
-import lombok.Getter
-import lombok.Setter
+import lombok.*
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 import java.sql.Timestamp
 
 @Canonical
@@ -51,10 +45,6 @@ class UserDetails implements Serializable{
     @Column(name = 'LOGIN_PASSWORD')
     @JsonProperty(value = 'LOGIN_PASSWORD')
     private String loginPassword
-
-    @Column(name = 'CLASS_ID')
-    @JsonProperty(value = 'CLASS_ID')
-    private Long classId
 
     @Column(name = 'MOBILE_NO')
     @JsonProperty(value = 'MOBILE_NO')
@@ -103,5 +93,10 @@ class UserDetails implements Serializable{
     @Column(name = 'SESSION_TOKEN')
     @JsonProperty(value = 'SESSION_TOKEN')
     private String sessionToken
+
+    @OneToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="CLASS_ID")
+    @JsonProperty(value = 'MAS_COURSES')
+    private MasCourses masCourses;
 
 }

@@ -82,4 +82,8 @@ class StudentService {
     def boolean existsByMobileNo(long mobileNo) {
         userDetailsRepo.existsByMobileNo(mobileNo)
     }
+
+    def UserDetails verifyLoginOTP(Map<String, String> map) {
+        userDetailsRepo.findTopByMobileNoOrderByUseridDesc(map.get("mobileNo").toLong())
+    }
 }

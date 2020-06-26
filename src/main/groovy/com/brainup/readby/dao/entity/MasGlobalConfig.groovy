@@ -34,4 +34,3 @@ class MasGlobalConfig {
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
 }
-

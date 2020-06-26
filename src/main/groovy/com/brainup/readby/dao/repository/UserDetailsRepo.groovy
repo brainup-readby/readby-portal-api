@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository
 interface UserDetailsRepo extends JpaRepository<UserDetails,Long> {
 
     def boolean existsByMobileNo(long mobileNo)
+
+    def UserDetails findByMobileNo(long mobileNo)
+
+    def UserDetails findTopByMobileNoOrderByUseridDesc(long mobileNo)
 }

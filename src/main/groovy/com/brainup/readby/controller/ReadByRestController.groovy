@@ -2,6 +2,7 @@ package com.brainup.readby.controller
 
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.UserDetails
+import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.StudentService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,58 +27,106 @@ class ReadByRestController {
 
     @GetMapping(value = "/getMasGlobalConfig")
     ResponseEntity getMasGlobalConfig() {
-        List<MasGlobalConfig> masGlobalConfig = studentService.findByIsActive("t")
-        log.info("size of MasGlobalConfig: " + masGlobalConfig.size())
-        ResponseEntity.status(HttpStatus.OK).body(masGlobalConfig)
+        try {
+            List<MasGlobalConfig> masGlobalConfig = studentService.findByIsActive("t")
+            log.info("size of MasGlobalConfig: " + masGlobalConfig.size())
+            ResponseEntity.status(HttpStatus.OK).body(masGlobalConfig)
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
     }
 
     @GetMapping(value = "/sendOTP")
     ResponseEntity sendOTP(@RequestParam Map<String, String> map) {
-        log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
-        String otp = studentService.sendOTP(map)
-        log.info "Generated OTP: ${otp}"
-        ResponseEntity.status(HttpStatus.OK).body(otp)
+        try {
+            log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
+            String otp = studentService.sendOTP(map)
+            log.info "Generated OTP: ${otp}"
+            ResponseEntity.status(HttpStatus.OK).body(otp)
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
     }
 
     @GetMapping(value = "/verifyOTP")
     ResponseEntity verifyOTP(@RequestParam Map<String, String> map) {
-        log.info "calling verifyOTP service for mobile no. ${map.get("mobileNo")} and otp ${map.get("otp")}"
-        Boolean otpFlag = studentService.verifyOTP(map)
-        log.info "Verified OTP: ${otpFlag}"
-        ResponseEntity.status(HttpStatus.OK).body(otpFlag)
+        try {
+            log.info "calling verifyOTP service for mobile no. ${map.get("mobileNo")} and otp ${map.get("otp")}"
+            Boolean otpFlag = studentService.verifyOTP(map)
+            log.info "Verified OTP: ${otpFlag}"
+            ResponseEntity.status(HttpStatus.OK).body(otpFlag)
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
     }
 
     @GetMapping(value = "/resendOTP")
     ResponseEntity resendOTP(@RequestParam Map<String, String> map) {
-        log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
-        String otp = studentService.resendOTP(map)
-        log.info "Generated OTP: ${otp}"
-        ResponseEntity.status(HttpStatus.OK).body(otp)
+        try {
+            log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
+            String otp = studentService.resendOTP(map)
+            log.info "Generated OTP: ${otp}"
+            ResponseEntity.status(HttpStatus.OK).body(otp)
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
     }
 
     @PostMapping(value = "/registerStudent")
     ResponseEntity registerStudent(@RequestBody UserDetails userDetails) {
-        log.info "calling registerStudent service for ${userDetails.firstName}"
-        if(studentService.existsByMobileNo(userDetails.mobileNo)){
-            log.info "${userDetails.mobileNo} mobile number already registered."
-            ResponseEntity.status(HttpStatus.CREATED).body("${userDetails.mobileNo} mobile number already registered.")
-        }else{
-            UserDetails userDetailsDao = studentService.registerStudent(userDetails)
-            log.info "Student registered with Id: ${userDetailsDao.userid}"
-            ResponseEntity.status(HttpStatus.CREATED).body(userDetailsDao)
+        try{
+            log.info "calling registerStudent service for ${userDetails.firstName}"
+            if(studentService.existsByMobileNo(userDetails.mobileNo)){
+                log.info "${userDetails.mobileNo} mobile number already registered."
+                ResponseEntity.status(HttpStatus.CREATED).body("${userDetails.mobileNo} mobile number already registered.")
+            }else {
+                UserDetails userDetailsDao = studentService.registerStudent(userDetails)
+                log.info "Student registered with Id: ${userDetailsDao.userid}"
+                ResponseEntity.status(HttpStatus.CREATED).body(userDetailsDao)
+            }
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
         }
     }
 
     @GetMapping(value = "/loginStudent")
     ResponseEntity loginStudent(@RequestParam Map<String, String> map) {
-        log.info "calling loginStudent service for mobile no. ${map.get("mobileNo")}"
-        if(studentService.existsByMobileNo(map.get("mobileNo").toLong())){
-            String otp = studentService.sendOTP(map)
-            log.info "Generated OTP: ${otp}"
-            ResponseEntity.status(HttpStatus.OK).body(otp)
-        }else{
-            log.info "${map.get("mobileNo")} is not registered."
-            ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
+        try {
+            log.info "calling loginStudent service for mobile no. ${map.get("mobileNo")}"
+            if (studentService.existsByMobileNo(map.get("mobileNo").toLong())) {
+                String otp = studentService.sendOTP(map)
+                log.info "Generated OTP: ${otp}"
+                ResponseEntity.status(HttpStatus.OK).body(otp)
+            } else {
+                log.info "${map.get("mobileNo")} is not registered."
+                ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
+            }
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/verifyLoginOTP")
+    ResponseEntity verifyLoginOTP(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling verifyLoginOTP service for mobile no. ${map.get("mobileNo")} and otp ${map.get("otp")}"
+            Boolean otpFlag = studentService.verifyOTP(map)
+            log.info "Verified OTP: ${otpFlag}"
+            if(otpFlag) {
+                UserDetails userDetails = studentService.verifyLoginOTP(map)
+                ResponseEntity.status(HttpStatus.OK).body(userDetails)
+            }else{
+                ResponseEntity.status(HttpStatus.OK).body(otpFlag)
+            }
+        }catch(Exception e){
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
         }
     }
 }
