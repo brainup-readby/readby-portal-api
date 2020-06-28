@@ -40,10 +40,14 @@ class ReadByRestController {
     @GetMapping(value = "/sendOTP")
     ResponseEntity sendOTP(@RequestParam Map<String, String> map) {
         try {
-            log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
-            String otp = studentService.sendOTP(map)
-            log.info "Generated OTP: ${otp}"
-            ResponseEntity.status(HttpStatus.OK).body(otp)
+            if(map.get("mobileNo").length() == 10) {
+                log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
+                String otp = studentService.sendOTP(map)
+                log.info "Generated OTP: ${otp}"
+                ResponseEntity.status(HttpStatus.OK).body(otp)
+            }else {
+                ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
+            }
         }catch(Exception e){
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
@@ -66,10 +70,14 @@ class ReadByRestController {
     @GetMapping(value = "/resendOTP")
     ResponseEntity resendOTP(@RequestParam Map<String, String> map) {
         try {
-            log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
-            String otp = studentService.resendOTP(map)
-            log.info "Generated OTP: ${otp}"
-            ResponseEntity.status(HttpStatus.OK).body(otp)
+            if(map.get("mobileNo").length() == 10) {
+                log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
+                String otp = studentService.resendOTP(map)
+                log.info "Generated OTP: ${otp}"
+                ResponseEntity.status(HttpStatus.OK).body(otp)
+            }else{
+                ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
+            }
         }catch(Exception e){
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
@@ -98,13 +106,17 @@ class ReadByRestController {
     ResponseEntity loginStudent(@RequestParam Map<String, String> map) {
         try {
             log.info "calling loginStudent service for mobile no. ${map.get("mobileNo")}"
-            if (studentService.existsByMobileNo(map.get("mobileNo").toLong())) {
-                String otp = studentService.sendOTP(map)
-                log.info "Generated OTP: ${otp}"
-                ResponseEntity.status(HttpStatus.OK).body(otp)
-            } else {
-                log.info "${map.get("mobileNo")} is not registered."
-                ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
+            if(map.get("mobileNo").length() == 10) {
+                if (studentService.existsByMobileNo(map.get("mobileNo").toLong())) {
+                    String otp = studentService.sendOTP(map)
+                    log.info "Generated OTP: ${otp}"
+                    ResponseEntity.status(HttpStatus.OK).body(otp)
+                } else {
+                    log.info "${map.get("mobileNo")} is not registered."
+                    ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
+                }
+            }else{
+                ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
         }catch(Exception e){
             log.error " ${e.message}"
