@@ -14,24 +14,24 @@ import java.sql.Timestamp
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_subjects')
+@Table(name = 'mas_stream')
 @Getter
 @Setter
 @ToString
-class MasSubjects implements Serializable{
+class MasStream implements Serializable{
 
     @Id
-    @Column(name = 'SUBJECT_ID')
-    @JsonProperty(value = 'SUBJECT_ID')
-    private Long subjectId
+    @Column(name = 'STREAM_ID')
+    @JsonProperty(value = 'STREAM_ID')
+    private Long streamId
 
-    @Column(name = 'SUBJECT_NAME')
-    @JsonProperty(value = 'SUBJECT_NAME')
-    private String subjectName
+    @Column(name = 'STREAM_CODE')
+    @JsonProperty(value = 'STREAM_CODE')
+    private String streamCode
 
-    @Column(name = 'SUBJECT_CODE')
-    @JsonProperty(value = 'SUBJECT_CODE')
-    private String subjectCode
+    @Column(name = 'STREAM_NAME')
+    @JsonProperty(value = 'STREAM_NAME')
+    private String streamName
 
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
@@ -57,23 +57,11 @@ class MasSubjects implements Serializable{
     @JsonIgnore
     private String updatedBy
 
-    @Column(name = 'icon_path')
-    @JsonProperty(value = 'icon_path')
-    private String iconPath
-
-   /* @Column(name = 'COURSE_ID')
-    @JsonProperty(value = 'COURSE_ID')
-    private Long courseId*/
-
-   /* @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_ID"), name = "COURSE_ID",insertable = false,updatable = false)
-    private MasCourses masCourses*/
+    private MasCourses masCourses
 
-    @OneToMany(mappedBy = "masSubjects", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'MAS_CHAPTERS')
-    private List<MasChapters> masChapters
-
-    @Column(name = 'STREAM_ID')
-    @JsonProperty(value = 'STREAM_ID')
-    private Long streamId
+    /*@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(foreignKey = @ForeignKey(name = "SUBSCRIPTION_ID"), name = "SUBSCRIPTION_ID",insertable = false,updatable = false)
+    private UserSubscriptions userSubscriptions*/
 }

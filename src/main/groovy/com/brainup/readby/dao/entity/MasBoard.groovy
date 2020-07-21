@@ -12,10 +12,7 @@ import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
-import javax.persistence.ForeignKey
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import java.sql.Timestamp
@@ -23,24 +20,24 @@ import java.sql.Timestamp
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_chapters')
+@Table(name = 'mas_boards')
 @Getter
 @Setter
 @ToString
-class MasChapters implements Serializable{
+class MasBoard implements Serializable{
 
     @Id
-    @Column(name = 'CHAPTER_ID')
-    @JsonProperty(value = 'CHAPTER_ID')
-    private Long chapterId
+    @Column(name = 'BOARD_ID')
+    @JsonProperty(value = 'BOARD_ID')
+    private Long boardId
 
-    @Column(name = 'CHAPTER_NAME')
-    @JsonProperty(value = 'CHAPTER_NAME')
-    private String chapterName
+    @Column(name = 'BOARD_NAME')
+    @JsonProperty(value = 'BOARD_NAME')
+    private String boardName
 
-    @Column(name = 'CHAPTER_CODE')
-    @JsonProperty(value = 'CHAPTER_CODE')
-    private String chapterCode
+    @Column(name = 'BOARD_CODE')
+    @JsonProperty(value = 'BOARD_CODE')
+    private String boardCode
 
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
@@ -66,17 +63,7 @@ class MasChapters implements Serializable{
     @JsonIgnore
     private String updatedBy
 
-    @Column(name = 'icon_path')
-    @JsonProperty(value = 'icon_path')
-    private String iconPath
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "SUBJECT_ID"), name = "SUBJECT_ID",insertable = false,updatable = false)
-    private MasSubjects masSubjects
-
-
-    @OneToMany(mappedBy = "masChapters", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'MAS_TOPICS')
-    private List<MasTopic> mastopic
-
+    @OneToMany(mappedBy = "masBoard", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonProperty(value = 'MAS_COURSE')
+    private List<MasCourses> masCourse
 }

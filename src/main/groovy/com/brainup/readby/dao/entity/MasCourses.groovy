@@ -19,9 +19,9 @@ import java.sql.Timestamp
 class MasCourses implements Serializable{
 
     @Id
-    @Column(name = 'CLASS_ID')
-    @JsonProperty(value = 'CLASS_ID')
-    private Long classId
+    @Column(name = 'COURSE_ID')
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
 
     @Column(name = 'COURSE_CODE')
     @JsonProperty(value = 'COURSE_CODE')
@@ -59,7 +59,24 @@ class MasCourses implements Serializable{
     @JsonProperty(value = 'icon_path')
     private String iconPath
 
-    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    /*@OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty(value = 'MAS_SUBJECTS')
-    private List<MasSubjects> masSubjects
+    private List<MasSubjects> masSubjects*/
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_TYPE_ID"), name = "COURSE_TYPE_ID",insertable = false,updatable = false)
+    private MasCoursesType masCoursesType
+
+    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonProperty(value = 'MAS_STREAM')
+    private List<MasStream> masStream
+
+    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonProperty(value = 'MAS_COURSE_YEAR')
+    private List<MasCourseYear> masCourseYear
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(foreignKey = @ForeignKey(name = "BOARD_ID"), name = "BOARD_ID",insertable = false,updatable = false)
+    private MasBoard masBoard
+
 }

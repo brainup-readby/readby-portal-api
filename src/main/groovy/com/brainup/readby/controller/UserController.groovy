@@ -39,7 +39,7 @@ public class UserController {
         Claims claims = Jwts.claims().setSubject(username)
         String token =  Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact()
 
-        String tokens = Jwts
+                String tokens = Jwts
                 .builder()
                 .setId("softtekJWT")
                 .setSubject(username)

@@ -1,7 +1,9 @@
 package com.brainup.readby.controller
 
+import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.UserDetails
+import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.StudentService
 import groovy.util.logging.Slf4j
@@ -31,7 +33,7 @@ class ReadByRestController {
             List<MasGlobalConfig> masGlobalConfig = studentService.findByIsActive("t")
             log.info("size of MasGlobalConfig: " + masGlobalConfig.size())
             ResponseEntity.status(HttpStatus.OK).body(masGlobalConfig)
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
@@ -40,15 +42,15 @@ class ReadByRestController {
     @GetMapping(value = "/sendOTP")
     ResponseEntity sendOTP(@RequestParam Map<String, String> map) {
         try {
-            if(map.get("mobileNo").length() == 10) {
+            if (map.get("mobileNo").length() == 10) {
                 log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
                 String otp = studentService.sendOTP(map)
                 log.info "Generated OTP: ${otp}"
                 ResponseEntity.status(HttpStatus.OK).body(otp)
-            }else {
+            } else {
                 ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
@@ -61,7 +63,7 @@ class ReadByRestController {
             Boolean otpFlag = studentService.verifyOTP(map)
             log.info "Verified OTP: ${otpFlag}"
             ResponseEntity.status(HttpStatus.OK).body(otpFlag)
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
@@ -70,33 +72,36 @@ class ReadByRestController {
     @GetMapping(value = "/resendOTP")
     ResponseEntity resendOTP(@RequestParam Map<String, String> map) {
         try {
-            if(map.get("mobileNo").length() == 10) {
+            if (map.get("mobileNo").length() == 10) {
                 log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
                 String otp = studentService.resendOTP(map)
                 log.info "Generated OTP: ${otp}"
                 ResponseEntity.status(HttpStatus.OK).body(otp)
-            }else{
+            } else {
                 ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
     }
 
-    @PostMapping(value = "/registerStudent")
+    @PostMapping(value = "/registerStudentDetail")
     ResponseEntity registerStudent(@RequestBody UserDetails userDetails) {
-        try{
+        try {
             log.info "calling registerStudent service for ${userDetails.firstName}"
-            if(studentService.existsByMobileNo(userDetails.mobileNo)){
+            if(userDetails.mobileNo.toString().length() != 10){
+                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("${userDetails.mobileNo} is less or greater than 10 digit")
+            }
+            else if (studentService.existsByMobileNo(userDetails.mobileNo)) {
                 log.info "${userDetails.mobileNo} mobile number already registered."
                 ResponseEntity.status(HttpStatus.CREATED).body("${userDetails.mobileNo} mobile number already registered.")
-            }else {
+            } else {
                 UserDetails userDetailsDao = studentService.registerStudent(userDetails)
                 log.info "Student registered with Id: ${userDetailsDao.userid}"
                 ResponseEntity.status(HttpStatus.CREATED).body(userDetailsDao)
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
@@ -106,7 +111,7 @@ class ReadByRestController {
     ResponseEntity loginStudent(@RequestParam Map<String, String> map) {
         try {
             log.info "calling loginStudent service for mobile no. ${map.get("mobileNo")}"
-            if(map.get("mobileNo").length() == 10) {
+            if (map.get("mobileNo").length() == 10) {
                 if (studentService.existsByMobileNo(map.get("mobileNo").toLong())) {
                     String otp = studentService.sendOTP(map)
                     log.info "Generated OTP: ${otp}"
@@ -115,10 +120,10 @@ class ReadByRestController {
                     log.info "${map.get("mobileNo")} is not registered."
                     ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
                 }
-            }else{
+            } else {
                 ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
@@ -130,13 +135,50 @@ class ReadByRestController {
             log.info "calling verifyLoginOTP service for mobile no. ${map.get("mobileNo")} and otp ${map.get("otp")}"
             Boolean otpFlag = studentService.verifyOTP(map)
             log.info "Verified OTP: ${otpFlag}"
-            if(otpFlag) {
+            if (otpFlag) {
                 UserDetails userDetails = studentService.verifyLoginOTP(map)
                 ResponseEntity.status(HttpStatus.OK).body(userDetails)
-            }else{
+            } else {
                 ResponseEntity.status(HttpStatus.OK).body(otpFlag)
             }
-        }catch(Exception e){
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+
+    @GetMapping(value = "/getBoardDetail")
+    ResponseEntity getBoardDetail(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getBoardDetail service."
+            List<MasBoard> masBoard = studentService.getBoardDetail()
+
+            ResponseEntity.status(HttpStatus.OK).body(masBoard)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/registerStudentSubscription")
+    ResponseEntity registerStudentSubscription(@RequestBody UserSubscriptions userSubscriptions) {
+        try {
+            log.info "calling registerStudentSubscription service for ${userSubscriptions.mobileNo}"
+            if(userSubscriptions.mobileNo.toString().length() != 10){
+                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("${userSubscriptions.mobileNo} is less or greater than 10 digit")
+            }
+            else if (studentService.existsByMobileNo(userSubscriptions.mobileNo)) {
+                UserDetails userDetailsDao = studentService.findByMobileNo(userSubscriptions.mobileNo)
+                userSubscriptions.userid = userDetailsDao.userid
+                UserSubscriptions usdao = studentService.registerStudentSubscription(userSubscriptions)
+                ResponseEntity.status(HttpStatus.CREATED).body(usdao)
+            } else {
+                log.info "${userSubscriptions.mobileNo} Mobile Number is not registered."
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("${userSubscriptions.mobileNo} Mobile Number is not registered.")
+            }
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }

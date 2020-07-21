@@ -8,30 +8,38 @@ import lombok.Getter
 import lombok.Setter
 import lombok.ToString
 
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.ForeignKey
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.Table
 import java.sql.Timestamp
 
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_subjects')
+@Table(name = 'mas_topics')
 @Getter
 @Setter
 @ToString
-class MasSubjects implements Serializable{
+class MasTopic implements Serializable{
 
     @Id
-    @Column(name = 'SUBJECT_ID')
-    @JsonProperty(value = 'SUBJECT_ID')
-    private Long subjectId
+    @Column(name = 'TOPIC_ID')
+    @JsonProperty(value = 'TOPIC_ID')
+    private Long topicId
 
-    @Column(name = 'SUBJECT_NAME')
-    @JsonProperty(value = 'SUBJECT_NAME')
-    private String subjectName
+    @Column(name = 'TOPIC_NAME')
+    @JsonProperty(value = 'TOPIC_NAME')
+    private String topicName
 
-    @Column(name = 'SUBJECT_CODE')
-    @JsonProperty(value = 'SUBJECT_CODE')
-    private String subjectCode
+    @Column(name = 'TOPIC_CODE')
+    @JsonProperty(value = 'TOPIC_CODE')
+    private String topicCode
 
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
@@ -61,19 +69,15 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'icon_path')
     private String iconPath
 
-   /* @Column(name = 'COURSE_ID')
-    @JsonProperty(value = 'COURSE_ID')
-    private Long courseId*/
+    @Column(name = 'VIDEO_URL')
+    @JsonProperty(value = 'VIDEO_URL')
+    private String videoUrl
 
-   /* @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_ID"), name = "COURSE_ID",insertable = false,updatable = false)
-    private MasCourses masCourses*/
+    @Column(name = 'BOOK_URL')
+    @JsonProperty(value = 'BOOK_URL')
+    private String booKUrl
 
-    @OneToMany(mappedBy = "masSubjects", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'MAS_CHAPTERS')
-    private List<MasChapters> masChapters
-
-    @Column(name = 'STREAM_ID')
-    @JsonProperty(value = 'STREAM_ID')
-    private Long streamId
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(foreignKey = @ForeignKey(name = "CHAPTER_ID"), name = "CHAPTER_ID",insertable = false,updatable = false)
+    private MasChapters masChapters
 }

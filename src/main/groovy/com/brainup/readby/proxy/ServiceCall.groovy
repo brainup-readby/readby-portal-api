@@ -1,6 +1,7 @@
 package com.brainup.readby.proxy
 
 import com.brainup.readby.controller.ReadByRestController
+import com.brainup.readby.dto.SMSResponse
 import com.brainup.readby.util.ReadByUtil
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand
 import groovy.util.logging.Slf4j
@@ -23,11 +24,11 @@ class ServiceCall {
     private String url
 
     @HystrixCommand(fallbackMethod = "getServiceResultFallBack")
-    public Boolean getServiceResult(String addressForUrl, Map<String, String> map) {
+    public SMSResponse getServiceResult(String addressForUrl, Map<String, String> map) {
         return callPublisher(addressForUrl,map)
     }
 
-    public Boolean getServiceResultFallBack(String addressForUrl, Map<String, String> map) {
+    public SMSResponse getServiceResultFallBack(String addressForUrl, Map<String, String> map) {
         try {
             Thread.sleep(10000)
             return callPublisher(addressForUrl,map)
@@ -37,9 +38,9 @@ class ServiceCall {
         }
     }
 
-    private Boolean callPublisher(String addressForUrl, Map<String, String> map){
+    private SMSResponse callPublisher(String addressForUrl, Map<String, String> map){
         log.info "Calling service on url :${url}"
-        return restTemplate.getForObject("${url}/getFile?key={key}&bucket={bucket}&fileName={fileName}", Boolean.class, map)
+        return restTemplate.getForObject("${url}message=Your OTP IS ${map.get("randomPIN")}&senderId=TBTSIG&routeId=8&mobileNos=${map.get("mobileNo")}&smsContentType=english", SMSResponse.class,map)
     }
 }
 

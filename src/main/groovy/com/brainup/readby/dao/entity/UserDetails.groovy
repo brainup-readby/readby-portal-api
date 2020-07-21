@@ -47,7 +47,7 @@ class UserDetails implements Serializable{
     @JsonIgnore
     private String loginPassword
 
-    @Column(name = 'MOBILE_NO')
+    @Column(name = 'MOBILE_NO',length = 10)
     @JsonProperty(value = 'MOBILE_NO')
     private Long mobileNo
 
@@ -99,9 +99,18 @@ class UserDetails implements Serializable{
     @JsonProperty(value = 'SESSION_TOKEN')
     private String sessionToken
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="CLASS_ID")
+   /* @OneToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="COURSE_ID")
     @JsonProperty(value = 'MAS_COURSES')
-    private MasCourses masCourses;
+    private MasCourses masCourses*/
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = 'USER_ID')
+    @JsonProperty(value = 'USER_SUBSCRIPTION')
+    private List<UserSubscriptions> userSubscriptions = new ArrayList<>()
+
+    @Column(name = 'INSTITUTION_NAME')
+    @JsonProperty(value = 'INSTITUTION_NAME')
+    private String institutionName
 
 }

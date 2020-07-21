@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface MasGlobalConfigRepo extends JpaRepository<MasGlobalConfig,Long>{
 
-    def List<MasGlobalConfig> findByIsActive(String isActive)
+    def List<MasGlobalConfig> findByIsActiveIgnoreCase(String isActive)
 }
