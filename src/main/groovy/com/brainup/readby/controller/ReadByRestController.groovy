@@ -1,5 +1,6 @@
 package com.brainup.readby.controller
 
+import com.brainup.readby.config.ResponseObject
 import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.UserDetails
@@ -32,7 +33,9 @@ class ReadByRestController {
         try {
             List<MasGlobalConfig> masGlobalConfig = studentService.findByIsActive("t")
             log.info("size of MasGlobalConfig: " + masGlobalConfig.size())
-            ResponseEntity.status(HttpStatus.OK).body(masGlobalConfig)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masGlobalConfig
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
         } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
@@ -46,7 +49,9 @@ class ReadByRestController {
                 log.info "calling sendOtp service for mobile no. ${map.get("mobileNo")}"
                 String otp = studentService.sendOTP(map)
                 log.info "Generated OTP: ${otp}"
-                ResponseEntity.status(HttpStatus.OK).body(otp)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = otp
+                ResponseEntity.status(HttpStatus.OK).body(responseObject)
             } else {
                 ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
@@ -62,7 +67,9 @@ class ReadByRestController {
             log.info "calling verifyOTP service for mobile no. ${map.get("mobileNo")} and otp ${map.get("otp")}"
             Boolean otpFlag = studentService.verifyOTP(map)
             log.info "Verified OTP: ${otpFlag}"
-            ResponseEntity.status(HttpStatus.OK).body(otpFlag)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = otpFlag
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
         } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
@@ -76,7 +83,9 @@ class ReadByRestController {
                 log.info "calling resendOTP service for mobile no. ${map.get("mobileNo")}"
                 String otp = studentService.resendOTP(map)
                 log.info "Generated OTP: ${otp}"
-                ResponseEntity.status(HttpStatus.OK).body(otp)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = otp
+                ResponseEntity.status(HttpStatus.OK).body(responseObject)
             } else {
                 ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
             }
@@ -91,15 +100,21 @@ class ReadByRestController {
         try {
             log.info "calling registerStudent service for ${userDetails.firstName}"
             if(userDetails.mobileNo.toString().length() != 10){
-                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("${userDetails.mobileNo} is less or greater than 10 digit")
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = "${userDetails.mobileNo} is less or greater than 10 digit"
+                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(responseObject)
             }
             else if (studentService.existsByMobileNo(userDetails.mobileNo)) {
                 log.info "${userDetails.mobileNo} mobile number already registered."
-                ResponseEntity.status(HttpStatus.CREATED).body("${userDetails.mobileNo} mobile number already registered.")
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = "${userDetails.mobileNo} mobile number already registered."
+                ResponseEntity.status(HttpStatus.CREATED).body(responseObject)
             } else {
                 UserDetails userDetailsDao = studentService.registerStudent(userDetails)
                 log.info "Student registered with Id: ${userDetailsDao.userid}"
-                ResponseEntity.status(HttpStatus.CREATED).body(userDetailsDao)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = userDetailsDao
+                ResponseEntity.status(HttpStatus.CREATED).body(responseObject)
             }
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -115,13 +130,19 @@ class ReadByRestController {
                 if (studentService.existsByMobileNo(map.get("mobileNo").toLong())) {
                     String otp = studentService.sendOTP(map)
                     log.info "Generated OTP: ${otp}"
-                    ResponseEntity.status(HttpStatus.OK).body(otp)
+                    ResponseObject responseObject = new ResponseObject()
+                    responseObject.data = otp
+                    ResponseEntity.status(HttpStatus.OK).body(responseObject)
                 } else {
                     log.info "${map.get("mobileNo")} is not registered."
-                    ResponseEntity.status(HttpStatus.CREATED).body("${map.get("mobileNo")} is not registered.")
+                    ResponseObject responseObject = new ResponseObject()
+                    responseObject.data = "${map.get("mobileNo")} is not registered."
+                    ResponseEntity.status(HttpStatus.CREATED).body(responseObject)
                 }
             } else {
-                ResponseEntity.status(HttpStatus.OK).body("Please enter 10 digit mobile number")
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = "Please enter 10 digit mobile number"
+                ResponseEntity.status(HttpStatus.OK).body(responseObject)
             }
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -137,9 +158,13 @@ class ReadByRestController {
             log.info "Verified OTP: ${otpFlag}"
             if (otpFlag) {
                 UserDetails userDetails = studentService.verifyLoginOTP(map)
-                ResponseEntity.status(HttpStatus.OK).body(userDetails)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = userDetails
+                ResponseEntity.status(HttpStatus.OK).body(responseObject)
             } else {
-                ResponseEntity.status(HttpStatus.OK).body(otpFlag)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = otpFlag
+                ResponseEntity.status(HttpStatus.OK).body(responseObject)
             }
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -153,8 +178,10 @@ class ReadByRestController {
         try {
             log.info "calling getBoardDetail service."
             List<MasBoard> masBoard = studentService.getBoardDetail()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masBoard
 
-            ResponseEntity.status(HttpStatus.OK).body(masBoard)
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
 
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -167,16 +194,22 @@ class ReadByRestController {
         try {
             log.info "calling registerStudentSubscription service for ${userSubscriptions.mobileNo}"
             if(userSubscriptions.mobileNo.toString().length() != 10){
-                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("${userSubscriptions.mobileNo} is less or greater than 10 digit")
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = "${userSubscriptions.mobileNo} is less or greater than 10 digit"
+                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(responseObject)
             }
             else if (studentService.existsByMobileNo(userSubscriptions.mobileNo)) {
                 UserDetails userDetailsDao = studentService.findByMobileNo(userSubscriptions.mobileNo)
                 userSubscriptions.userid = userDetailsDao.userid
                 UserSubscriptions usdao = studentService.registerStudentSubscription(userSubscriptions)
-                ResponseEntity.status(HttpStatus.CREATED).body(usdao)
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = usdao
+                ResponseEntity.status(HttpStatus.CREATED).body(responseObject)
             } else {
                 log.info "${userSubscriptions.mobileNo} Mobile Number is not registered."
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("${userSubscriptions.mobileNo} Mobile Number is not registered.")
+                ResponseObject responseObject = new ResponseObject()
+                responseObject.data = "${userSubscriptions.mobileNo} Mobile Number is not registered."
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseObject)
             }
         } catch (Exception e) {
             log.error " ${e.message}"
