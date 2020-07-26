@@ -105,4 +105,8 @@ class UserSubscriptions implements Serializable{
     @JsonProperty(value = "MAS_COURSE")
     MasCoursesDTO masCourses
 
+    @Column(name = 'INSTITUTION_NAME')
+    @JsonProperty(value = 'INSTITUTION_NAME')
+    private String institutionName
+
 }

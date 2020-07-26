@@ -39,4 +39,8 @@ class MasCourseYear implements Serializable{
     @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_ID"), name = "COURSE_ID",insertable = false,updatable = false)
     private MasCourses masCourses
 
+    @Column(name = 'DISPLAY_NAME')
+    @JsonProperty(value = 'DISPLAY_NAME')
+    private String displayName
+
 }

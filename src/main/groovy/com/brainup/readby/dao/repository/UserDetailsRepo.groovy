@@ -12,4 +12,6 @@ interface UserDetailsRepo extends JpaRepository<UserDetails,Long> {
     def UserDetails findByMobileNo(long mobileNo)
 
     def UserDetails findTopByMobileNoOrderByUseridDesc(long mobileNo)
+
+    def UserDetails findByUserid(long userId)
 }

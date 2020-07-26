@@ -1,11 +1,11 @@
 package com.brainup.readby.dao.repository
 
-import com.brainup.readby.dao.entity.MasStream
+import com.brainup.readby.dao.entity.MasRole
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MasStreamRepo extends JpaRepository<MasStream,Long> {
+interface MasRoleRepo extends JpaRepository<MasRole,Long> {
 
-    MasStream findByStreamId(long streamId)
+    def List<MasRole> findByIsActive(String s)
 }

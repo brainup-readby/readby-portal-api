@@ -108,9 +108,4 @@ class UserDetails implements Serializable{
     @JoinColumn(name = 'USER_ID')
     @JsonProperty(value = 'USER_SUBSCRIPTION')
     private List<UserSubscriptions> userSubscriptions = new ArrayList<>()
-
-    @Column(name = 'INSTITUTION_NAME')
-    @JsonProperty(value = 'INSTITUTION_NAME')
-    private String institutionName
-
 }

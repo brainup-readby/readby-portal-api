@@ -61,6 +61,14 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'icon_path')
     private String iconPath
 
+    @Column(name = 'STREAM_ID')
+    @JsonProperty(value = 'STREAM_ID')
+    private Long streamId
+
+    @Column(name = 'YEAR_ID')
+    @JsonProperty(value = 'YEAR_ID')
+    private Long yearId
+
    /* @Column(name = 'COURSE_ID')
     @JsonProperty(value = 'COURSE_ID')
     private Long courseId*/
@@ -73,7 +81,5 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'MAS_CHAPTERS')
     private List<MasChapters> masChapters
 
-    @Column(name = 'STREAM_ID')
-    @JsonProperty(value = 'STREAM_ID')
-    private Long streamId
+
 }
