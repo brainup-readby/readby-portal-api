@@ -3,6 +3,7 @@ package com.brainup.readby.dao.entity
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
+import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.Canonical
@@ -104,6 +105,10 @@ class UserSubscriptions implements Serializable{
     @Transient
     @JsonProperty(value = "MAS_COURSE")
     MasCoursesDTO masCourses
+
+    @Transient
+    @JsonProperty(value = "STUDENT_STUDY_STATE")
+    RbStudentStudyStateDTO rbStudentStudyState
 
     @Column(name = 'INSTITUTION_NAME')
     @JsonProperty(value = 'INSTITUTION_NAME')

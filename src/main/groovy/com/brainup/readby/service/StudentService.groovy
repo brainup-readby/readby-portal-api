@@ -8,6 +8,7 @@ import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.OtpInfo
+import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.dao.repository.MasBoardRepo
@@ -18,11 +19,13 @@ import com.brainup.readby.dao.repository.MasRoleRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
+import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
+import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.brainup.readby.dto.SMSResponse
 import com.brainup.readby.proxy.ServiceCall
 import groovy.util.logging.Slf4j
@@ -69,6 +72,9 @@ class StudentService {
     @Autowired
     MasRoleRepo masRoleRepo
 
+    @Autowired
+    RbStudentStudyStateRepo rbStudentStudyStateRepo
+
     @Value('${readby.otp.url}')
     private String otpUrl
 
@@ -82,7 +88,7 @@ class StudentService {
         int randomPIN = (int)(Math.random()*9000)+1000
         log.info"randomOTP ${randomPIN}"
         map.put("randomPIN",String.valueOf(randomPIN))
-        SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+        //SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
         OtpInfo otpInfo = new OtpInfo(
                 otp: String.valueOf(randomPIN),
                 mobileNo: map.get("mobileNo").toLong(),
@@ -112,7 +118,7 @@ class StudentService {
             int randomPIN = (int)(Math.random()*9000)+1000
             log.info"randomOTP ${randomPIN}"
             map.put("randomPIN",String.valueOf(randomPIN))
-            SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+          //  SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
             if (otpInfo.retryLimit > 0) {
                 Integer retryLimit = otpInfo.retryLimit
                 otpInfo.retryLimit = retryLimit - 1
@@ -171,6 +177,15 @@ class StudentService {
             List<UserSubscriptions> userSubscriptionsli = new ArrayList<>()
             log.info "Number of user subscription ${userSubscriptions.size()}"
             for (UserSubscriptions us : userSubscriptions) {
+                RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
+                RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
+                System.out.println(rbStudentStudyStateDao.stateId)
+                rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
+                System.out.println(rbStudentStudyStateDTO.stateId)
+                rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
+                rbStudentStudyStateDTO.topicId = rbStudentStudyStateDao.topicId
+                rbStudentStudyStateDTO.videoLeftTime = rbStudentStudyStateDao.videoLeftTime
+                us.rbStudentStudyState = rbStudentStudyStateDTO
                 MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
                 List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamId(us.streamId)
                 MasStreamDTO masStreamDTO = new MasStreamDTO()
@@ -202,5 +217,9 @@ class StudentService {
 
     def List<MasRole> findRoleByIsActive(String isActive) {
         masRoleRepo.findByIsActive(isActive)
+    }
+
+    def RbStudentStudyState saveRbStudentStudyState(RbStudentStudyState rbStudentStudyState) {
+        return rbStudentStudyStateRepo.save(rbStudentStudyState)
     }
 }

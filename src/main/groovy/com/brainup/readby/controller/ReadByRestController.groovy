@@ -5,6 +5,7 @@ import com.brainup.readby.config.ResponseObject
 import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.MasRole
+import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.exception.BadRequestException
@@ -240,6 +241,19 @@ class ReadByRestController {
             responseObject.data = userDetails
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/saveStudentStudyState")
+    ResponseEntity saveStudentStudyState(@RequestBody RbStudentStudyState rbStudentStudyState) {
+        try {
+            RbStudentStudyState rbStudentStudyStatedb = studentService.saveRbStudentStudyState(rbStudentStudyState)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbStudentStudyStatedb
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        }catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }
