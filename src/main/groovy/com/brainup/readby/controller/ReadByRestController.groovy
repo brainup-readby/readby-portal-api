@@ -5,6 +5,7 @@ import com.brainup.readby.config.ResponseObject
 import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.MasRole
+import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
@@ -254,6 +255,19 @@ class ReadByRestController {
             responseObject.data = rbStudentStudyStatedb
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         }catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getQuestionByTopic")
+    ResponseEntity getQuestionByTopic(@RequestParam Map<String, String> map) {
+        try {
+            RbQuestionnaires rbQuestionnaires = studentService.getQuestionByTopic(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbQuestionnaires
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        } catch (Exception e) {
             log.error " ${e.message}"
             throw new BadRequestException(e.message)
         }

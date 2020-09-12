@@ -8,6 +8,7 @@ import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.OtpInfo
+import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
@@ -19,6 +20,7 @@ import com.brainup.readby.dao.repository.MasRoleRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
+import com.brainup.readby.dao.repository.RbQuestionnairesRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
@@ -74,6 +76,9 @@ class StudentService {
 
     @Autowired
     RbStudentStudyStateRepo rbStudentStudyStateRepo
+
+    @Autowired
+    RbQuestionnairesRepo rbQuestionnairesRepo
 
     @Value('${readby.otp.url}')
     private String otpUrl
@@ -221,5 +226,9 @@ class StudentService {
 
     def RbStudentStudyState saveRbStudentStudyState(RbStudentStudyState rbStudentStudyState) {
         return rbStudentStudyStateRepo.save(rbStudentStudyState)
+    }
+
+    def RbQuestionnaires getQuestionByTopic(Map<String, String> map) {
+        rbQuestionnairesRepo.findByTopicId(map.get("topicId").toLong())
     }
 }
