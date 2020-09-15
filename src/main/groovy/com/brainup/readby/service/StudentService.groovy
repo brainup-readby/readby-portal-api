@@ -8,7 +8,10 @@ import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.OtpInfo
+import com.brainup.readby.dao.entity.RbMultipleAnswers
 import com.brainup.readby.dao.entity.RbQuestionnaires
+import com.brainup.readby.dao.entity.RbStudentAnswers
+import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
@@ -20,7 +23,10 @@ import com.brainup.readby.dao.repository.MasRoleRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
+import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
+import com.brainup.readby.dao.repository.RbStudentAnswersRepo
+import com.brainup.readby.dao.repository.RbStudentReportRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
@@ -80,8 +86,23 @@ class StudentService {
     @Autowired
     RbQuestionnairesRepo rbQuestionnairesRepo
 
+    @Autowired
+    RbStudentAnswersRepo rbStudentAnswersRepo
+
+    @Autowired
+    RbMultipleAnswersRepo rbMultipleAnswersRepo
+
+    @Autowired
+    RbStudentReportRepo rbStudentReportRepo
+
     @Value('${readby.otp.url}')
     private String otpUrl
+
+    @Value('${student.maxmarks}')
+    private String maxMarks
+
+    @Value('${student.percentagethreshold}')
+    private String percentagethreshold
 
     List<MasGlobalConfig> findByIsActive(String isActive) {
         List<MasGlobalConfig> masGlobalConfig = masGlobalConfigRepo.findByIsActiveIgnoreCase(isActive)
@@ -230,5 +251,33 @@ class StudentService {
 
     def RbQuestionnaires getQuestionByTopic(Map<String, String> map) {
         rbQuestionnairesRepo.findByTopicId(map.get("topicId").toLong())
+    }
+
+    def RbStudentReport saveStudentAnswer(List<RbStudentAnswers> rbStudentAnswers) {
+        int totalMarksScored = 0
+        List<RbStudentAnswers> rbStudentAnswered = rbStudentAnswersRepo.saveAll(rbStudentAnswers)
+        for(RbStudentAnswers obj : rbStudentAnswered){
+            RbMultipleAnswers rbMultipleAnswers = rbMultipleAnswersRepo.findByQuestionId(obj.questionId)
+            if(rbMultipleAnswers.correctOptionId == obj.givenAnswer){
+                totalMarksScored = totalMarksScored + rbMultipleAnswers.marks
+            }
+        }
+        int percentage = totalMarksScored/maxMarks.toInteger()*100
+        String result
+        if(percentage > percentagethreshold.toInteger()){
+            result = "pass"
+        }else{
+            result = "fail"
+        }
+        RbStudentReport rbStudentReport = new RbStudentReport(
+                topicId: rbStudentAnswers.get(0).topicId,
+                userId: rbStudentAnswers.get(0).userId,
+                totalMarksObtained: totalMarksScored,
+                maximumMarks: maxMarks.toInteger(),
+                totalPercentage: percentage,
+                overallResult: result
+        )
+        rbStudentReportRepo.save(rbStudentReport)
+
     }
 }

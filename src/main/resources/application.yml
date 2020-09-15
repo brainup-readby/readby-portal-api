@@ -10,4 +10,7 @@ spring.jpa.database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 security.basic.enable: false
 security.ignored: /**
 
+student.maxmarks: 100
+student.percentagethreshold: 70
+
 readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&
