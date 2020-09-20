@@ -81,5 +81,9 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'MAS_CHAPTERS')
     private List<MasChapters> masChapters
 
+    @Column(name = 'SUBJECT_PRICE')
+    @JsonProperty(value = 'SUBJECT_PRICE')
+    private Long subjectPrice
+
 
 }

@@ -46,7 +46,6 @@ class RbStudentReport implements Serializable{
 
     @Column(name = 'OVERALL_RESULT')
     @JsonProperty(value = 'OVERALL_RESULT')
-    @JsonIgnore
     private String overallResult
 
     @Column(name = 'CREATED_AT')
@@ -68,6 +67,5 @@ class RbStudentReport implements Serializable{
     @JsonProperty(value = 'UPDATED_BY')
     @JsonIgnore
     private String updatedBy
-
 
 }

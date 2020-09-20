@@ -80,4 +80,8 @@ class MasTopic implements Serializable{
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(foreignKey = @ForeignKey(name = "CHAPTER_ID"), name = "CHAPTER_ID",insertable = false,updatable = false)
     private MasChapters masChapters
+
+    @Column(name = 'TOPIC_SUBSCRIPTION')
+    @JsonProperty(value = 'TOPIC_SUBSCRIPTION')
+    private String topicSubscription
 }
