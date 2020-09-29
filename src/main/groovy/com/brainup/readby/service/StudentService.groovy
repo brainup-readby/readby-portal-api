@@ -15,6 +15,7 @@ import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
+import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.dao.repository.MasBoardRepo
 import com.brainup.readby.dao.repository.MasCourseYearRepo
 import com.brainup.readby.dao.repository.MasCoursesRepo
@@ -30,12 +31,14 @@ import com.brainup.readby.dao.repository.RbStudentReportRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
+import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
 import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.brainup.readby.dto.SMSResponse
 import com.brainup.readby.proxy.ServiceCall
+import com.brainup.readby.util.ReadByUtil
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -54,6 +57,9 @@ class StudentService {
     ServiceCall serviceCall
 
     @Autowired
+    ReadByUtil readByUtil
+
+    @Autowired
     OtpInfoRepo otpInfoRepo
 
     @Autowired
@@ -70,6 +76,9 @@ class StudentService {
 
     @Autowired
     MasCourseYearRepo masCourseYearRepo
+
+    @Autowired
+    UserTransactionDetailsRepo userTransactionDetailsRepo
 
     @Autowired
     MasCoursesRepo masCoursesRepo
@@ -104,6 +113,12 @@ class StudentService {
     @Value('${student.percentagethreshold}')
     private String percentagethreshold
 
+    @Value('${readby.mid}')
+    private String mid
+
+    @Value('${readby.mkey}')
+    private String mkey
+
     List<MasGlobalConfig> findByIsActive(String isActive) {
         List<MasGlobalConfig> masGlobalConfig = masGlobalConfigRepo.findByIsActiveIgnoreCase(isActive)
         return masGlobalConfig
@@ -111,9 +126,9 @@ class StudentService {
 
     def String sendOTP(Map<String, String> map) {
 
-        int randomPIN = (int)(Math.random()*9000)+1000
-        log.info"randomOTP ${randomPIN}"
-        map.put("randomPIN",String.valueOf(randomPIN))
+        int randomPIN = (int) (Math.random() * 9000) + 1000
+        log.info "randomOTP ${randomPIN}"
+        map.put("randomPIN", String.valueOf(randomPIN))
         SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
         OtpInfo otpInfo = new OtpInfo(
                 otp: String.valueOf(randomPIN),
@@ -140,10 +155,10 @@ class StudentService {
     def String resendOTP(Map<String, String> map) {
 
         OtpInfo otpInfo = otpInfoRepo.findTopByMobileNoAndIsUsedOrderByOtpIdDesc(map.get("mobileNo").toLong(), 'f')
-        if(otpInfo != null) {
-            int randomPIN = (int)(Math.random()*9000)+1000
-            log.info"randomOTP ${randomPIN}"
-            map.put("randomPIN",String.valueOf(randomPIN))
+        if (otpInfo != null) {
+            int randomPIN = (int) (Math.random() * 9000) + 1000
+            log.info "randomOTP ${randomPIN}"
+            map.put("randomPIN", String.valueOf(randomPIN))
             SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
             if (otpInfo.retryLimit > 0) {
                 Integer retryLimit = otpInfo.retryLimit
@@ -154,7 +169,7 @@ class StudentService {
             } else {
                 return "you have exceeded the limit "
             }
-        }else{
+        } else {
             return "Use send otp option first."
         }
 
@@ -197,8 +212,8 @@ class StudentService {
         return mapuserSubscriptions(userDetails)
     }
 
-    private UserDetails mapuserSubscriptions(UserDetails userDetails){
-        if(userDetails.userSubscriptions != null && userDetails.userSubscriptions.size()>0) {
+    private UserDetails mapuserSubscriptions(UserDetails userDetails) {
+        if (userDetails.userSubscriptions != null && userDetails.userSubscriptions.size() > 0) {
             List<UserSubscriptions> userSubscriptions = userDetails.userSubscriptions
             List<UserSubscriptions> userSubscriptionsli = new ArrayList<>()
             log.info "Number of user subscription ${userSubscriptions.size()}"
@@ -256,17 +271,17 @@ class StudentService {
     def RbStudentReport saveStudentAnswer(List<RbStudentAnswers> rbStudentAnswers) {
         int totalMarksScored = 0
         List<RbStudentAnswers> rbStudentAnswered = rbStudentAnswersRepo.saveAll(rbStudentAnswers)
-        for(RbStudentAnswers obj : rbStudentAnswered){
+        for (RbStudentAnswers obj : rbStudentAnswered) {
             RbMultipleAnswers rbMultipleAnswers = rbMultipleAnswersRepo.findByQuestionId(obj.questionId)
-            if(rbMultipleAnswers.correctOptionId == obj.givenAnswer){
+            if (rbMultipleAnswers.correctOptionId == obj.givenAnswer) {
                 totalMarksScored = totalMarksScored + rbMultipleAnswers.marks
             }
         }
-        int percentage = totalMarksScored/maxMarks.toInteger()*100
+        int percentage = totalMarksScored / maxMarks.toInteger() * 100
         String result
-        if(percentage > percentagethreshold.toInteger()){
+        if (percentage > percentagethreshold.toInteger()) {
             result = "pass"
-        }else{
+        } else {
             result = "fail"
         }
         RbStudentReport rbStudentReport = new RbStudentReport(
@@ -279,5 +294,22 @@ class StudentService {
         )
         rbStudentReportRepo.save(rbStudentReport)
 
+    }
+
+    def UserTransactionDetails saveUserTransaction(UserTransactionDetails userTransactionDetails) {
+        String orderId = "readby" + readByUtil.getRandomNumberString()
+        userTransactionDetails.orderId = orderId
+        userTransactionDetails.createdBy = "read_by"
+        userTransactionDetails.updatedBy = "read_by"
+        UserTransactionDetails ut = userTransactionDetailsRepo.save(userTransactionDetails)
+        String checksum = readByUtil.paytmChecksum(mid,orderId,mkey)
+        ut.checksumVal = checksum
+        UserTransactionDetails utdb = userTransactionDetailsRepo.save(userTransactionDetails)
+        return utdb
+    }
+
+    def UserTransactionDetails updateUserTransaction(UserTransactionDetails userTransactionDetails) {
+
+        return  userTransactionDetailsRepo.save(userTransactionDetails)
     }
 }

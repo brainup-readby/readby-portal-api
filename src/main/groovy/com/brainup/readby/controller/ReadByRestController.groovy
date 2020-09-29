@@ -11,6 +11,7 @@ import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
+import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.StudentService
 import groovy.util.logging.Slf4j
@@ -281,6 +282,33 @@ class ReadByRestController {
             RbStudentReport rbStudentReport = studentService.saveStudentAnswer(rbStudentAnswers)
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = rbStudentReport
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        }catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+
+    @PostMapping(value = "/saveUserTransaction")
+    ResponseEntity saveUserTransaction(@RequestBody UserTransactionDetails userTransactionDetails) {
+        try {
+            UserTransactionDetails userTransactionDetailsDb = studentService.saveUserTransaction(userTransactionDetails)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = userTransactionDetailsDb
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        }catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/updateUserTransaction")
+    ResponseEntity updateUserTransaction(@RequestBody UserTransactionDetails userTransactionDetails) {
+        try {
+            UserTransactionDetails userTransactionDetailsDb = studentService.updateUserTransaction(userTransactionDetails)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = userTransactionDetailsDb
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         }catch (Exception e) {
             log.error " ${e.message}"

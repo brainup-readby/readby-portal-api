@@ -13,4 +13,7 @@ security.ignored: /**
 student.maxmarks: 100
 student.percentagethreshold: 70
 
+readby.mid: oBKImO82025244498334
+readby.mkey: omDHo8wTS!Wi1ayH
+
 readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&
