@@ -7,6 +7,7 @@ import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasSubjects
+import com.brainup.readby.dao.entity.MasTopic
 import com.brainup.readby.dao.entity.OtpInfo
 import com.brainup.readby.dao.entity.RbMultipleAnswers
 import com.brainup.readby.dao.entity.RbQuestionnaires
@@ -23,6 +24,7 @@ import com.brainup.readby.dao.repository.MasGlobalConfigRepo
 import com.brainup.readby.dao.repository.MasRoleRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
+import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
 import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
@@ -61,6 +63,9 @@ class StudentService {
 
     @Autowired
     OtpInfoRepo otpInfoRepo
+
+    @Autowired
+    MasTopicRepo masTopicRepo
 
     @Autowired
     UserDetailsRepo userDetailsRepo
@@ -297,7 +302,7 @@ class StudentService {
     }
 
     def UserTransactionDetails saveUserTransaction(UserTransactionDetails userTransactionDetails) {
-        String orderId = "readby" + readByUtil.getRandomNumberString()
+        String orderId = "Order1234555565"//"readby" + readByUtil.getRandomNumberString()
         userTransactionDetails.orderId = orderId
         userTransactionDetails.createdBy = "read_by"
         userTransactionDetails.updatedBy = "read_by"
@@ -311,5 +316,16 @@ class StudentService {
     def UserTransactionDetails updateUserTransaction(UserTransactionDetails userTransactionDetails) {
 
         return  userTransactionDetailsRepo.save(userTransactionDetails)
+    }
+
+    def MasTopic updateTopicFlag(Map<String, String> map) {
+        System.out.println(map.get("TOPIC_ID"))
+        System.out.println(map.get("VIDEO_STATUS"))
+        System.out.println(map.get("TEST_STATUS"))
+        MasTopic masTopic = masTopicRepo.findByTopicId(map.get("TOPIC_ID").toLong())
+        masTopic.videoStatus = map.get("VIDEO_STATUS").toString()
+        masTopic.testStatus = map.get("TEST_STATUS").toString()
+        masTopicRepo.save(masTopic)
+
     }
 }

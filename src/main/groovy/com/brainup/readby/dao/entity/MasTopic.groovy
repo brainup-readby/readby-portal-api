@@ -84,4 +84,12 @@ class MasTopic implements Serializable{
     @Column(name = 'TOPIC_SUBSCRIPTION')
     @JsonProperty(value = 'TOPIC_SUBSCRIPTION')
     private String topicSubscription
+
+    @Column(name = 'VIDEO_STATUS')
+    @JsonProperty(value = 'VIDEO_STATUS')
+    private String videoStatus
+
+    @Column(name = 'TEST_STATUS')
+    @JsonProperty(value = 'TEST_STATUS')
+    private String testStatus
 }
