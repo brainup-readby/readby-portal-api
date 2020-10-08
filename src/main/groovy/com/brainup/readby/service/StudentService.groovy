@@ -134,7 +134,7 @@ class StudentService {
         int randomPIN = (int) (Math.random() * 9000) + 1000
         log.info "randomOTP ${randomPIN}"
         map.put("randomPIN", String.valueOf(randomPIN))
-        SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+        //SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
         OtpInfo otpInfo = new OtpInfo(
                 otp: String.valueOf(randomPIN),
                 mobileNo: map.get("mobileNo").toLong(),
@@ -164,7 +164,7 @@ class StudentService {
             int randomPIN = (int) (Math.random() * 9000) + 1000
             log.info "randomOTP ${randomPIN}"
             map.put("randomPIN", String.valueOf(randomPIN))
-            SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+           // SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
             if (otpInfo.retryLimit > 0) {
                 Integer retryLimit = otpInfo.retryLimit
                 otpInfo.retryLimit = retryLimit - 1
