@@ -134,7 +134,7 @@ class StudentService {
         int randomPIN = (int) (Math.random() * 9000) + 1000
         log.info "randomOTP ${randomPIN}"
         map.put("randomPIN", String.valueOf(randomPIN))
-        //SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+        SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
         OtpInfo otpInfo = new OtpInfo(
                 otp: String.valueOf(randomPIN),
                 mobileNo: map.get("mobileNo").toLong(),
@@ -164,7 +164,7 @@ class StudentService {
             int randomPIN = (int) (Math.random() * 9000) + 1000
             log.info "randomOTP ${randomPIN}"
             map.put("randomPIN", String.valueOf(randomPIN))
-           // SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
+            SMSResponse otpValue = serviceCall.getServiceResult(otpUrl, map)
             if (otpInfo.retryLimit > 0) {
                 Integer retryLimit = otpInfo.retryLimit
                 otpInfo.retryLimit = retryLimit - 1
@@ -225,34 +225,42 @@ class StudentService {
             for (UserSubscriptions us : userSubscriptions) {
                 RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
                 RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
-                System.out.println(rbStudentStudyStateDao.stateId)
-                rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
-                System.out.println(rbStudentStudyStateDTO.stateId)
-                rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
-                rbStudentStudyStateDTO.topicId = rbStudentStudyStateDao.topicId
-                rbStudentStudyStateDTO.videoLeftTime = rbStudentStudyStateDao.videoLeftTime
+                if (rbStudentStudyStateDao != null) {
+                    System.out.println("Student study state id: "+rbStudentStudyStateDao.stateId)
+                    rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
+                    System.out.println(rbStudentStudyStateDTO.stateId)
+                    rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
+                    rbStudentStudyStateDTO.topicId = rbStudentStudyStateDao.topicId
+                    rbStudentStudyStateDTO.videoLeftTime = rbStudentStudyStateDao.videoLeftTime
+                }
                 us.rbStudentStudyState = rbStudentStudyStateDTO
                 MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
                 List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamId(us.streamId)
                 MasStreamDTO masStreamDTO = new MasStreamDTO()
-                masStreamDTO.streamId = masStreamDao.streamId
-                masStreamDTO.streamName = masStreamDao.streamName
-                masStreamDTO.streamCode = masStreamDao.streamCode
-                masStreamDTO.masSubjects = masSubjectsList
+                if(masStreamDTO != null) {
+                    masStreamDTO.streamId = masStreamDao.streamId
+                    masStreamDTO.streamName = masStreamDao.streamName
+                    masStreamDTO.streamCode = masStreamDao.streamCode
+                    masStreamDTO.masSubjects = masSubjectsList
+                }
                 us.masStream = masStreamDTO
                 MasCourseYear masCourseYearDao = masCourseYearRepo.findByYearId(us.yearId)
                 us.masCourseYear = masCourseYearDao
                 MasBoard masBoardDao = masBoardRepo.findByBoardId(us.boardId)
                 MasBoardDTO masBoardDTO = new MasBoardDTO()
-                masBoardDTO.boardId = masBoardDao.boardId
-                masBoardDTO.boardName = masBoardDao.boardName
-                masBoardDTO.boardCode = masBoardDao.boardCode
+                if(masBoardDao != null) {
+                    masBoardDTO.boardId = masBoardDao.boardId
+                    masBoardDTO.boardName = masBoardDao.boardName
+                    masBoardDTO.boardCode = masBoardDao.boardCode
+                }
                 us.masBoard = masBoardDTO
                 MasCourses masCoursesDao = masCoursesRepo.findByCourseId(us.courseId)
                 MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
-                masCoursesDTO.courseId = masCoursesDao.courseId
-                masCoursesDTO.courseName = masCoursesDao.courseName
-                masCoursesDTO.courseCode = masCoursesDao.courseCode
+                if(masCoursesDao != null) {
+                    masCoursesDTO.courseId = masCoursesDao.courseId
+                    masCoursesDTO.courseName = masCoursesDao.courseName
+                    masCoursesDTO.courseCode = masCoursesDao.courseCode
+                }
                 us.masCourses = masCoursesDTO
                 userSubscriptionsli.add(us)
             }
@@ -307,7 +315,7 @@ class StudentService {
         userTransactionDetails.createdBy = "read_by"
         userTransactionDetails.updatedBy = "read_by"
         UserTransactionDetails ut = userTransactionDetailsRepo.save(userTransactionDetails)
-        String checksum = readByUtil.paytmChecksum(mid,orderId,mkey)
+        String checksum = readByUtil.paytmChecksum(mid, orderId, mkey)
         ut.checksumVal = checksum
         UserTransactionDetails utdb = userTransactionDetailsRepo.save(userTransactionDetails)
         return utdb
@@ -315,7 +323,7 @@ class StudentService {
 
     def UserTransactionDetails updateUserTransaction(UserTransactionDetails userTransactionDetails) {
 
-        return  userTransactionDetailsRepo.save(userTransactionDetails)
+        return userTransactionDetailsRepo.save(userTransactionDetails)
     }
 
     def MasTopic updateTopicFlag(Map<String, String> map) {
