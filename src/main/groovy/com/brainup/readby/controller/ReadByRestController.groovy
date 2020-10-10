@@ -281,6 +281,7 @@ class ReadByRestController {
     ResponseEntity saveStudentAnswer(@RequestBody List<RbStudentAnswers> rbStudentAnswers) {
         try {
             RbStudentReport rbStudentReport = studentService.saveStudentAnswer(rbStudentAnswers)
+            System.out.println("Student report..."+rbStudentReport.reportId)
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = rbStudentReport
             ResponseEntity.status(HttpStatus.OK).body(responseObject)

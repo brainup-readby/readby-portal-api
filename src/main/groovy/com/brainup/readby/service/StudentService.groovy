@@ -284,14 +284,28 @@ class StudentService {
     def RbStudentReport saveStudentAnswer(List<RbStudentAnswers> rbStudentAnswers) {
         int totalMarksScored = 0
         List<RbStudentAnswers> rbStudentAnswered = rbStudentAnswersRepo.saveAll(rbStudentAnswers)
+        System.out.println("List of student answer.."+rbStudentAnswered.size())
+        log.info("List of student answer.."+rbStudentAnswered.size())
         for (RbStudentAnswers obj : rbStudentAnswered) {
+            System.out.println("findByQuestionId...."+obj.questionId)
+            log.info("findByQuestionId...."+obj.questionId)
             RbMultipleAnswers rbMultipleAnswers = rbMultipleAnswersRepo.findByQuestionId(obj.questionId)
+            System.out.println("rbMultipleAnswers.correctOptionId.."+rbMultipleAnswers.correctOptionId+"obj.givenAnswer"+obj.givenAnswer)
+            log.info("rbMultipleAnswers.correctOptionId.."+rbMultipleAnswers.correctOptionId+"obj.givenAnswer"+obj.givenAnswer)
             if (rbMultipleAnswers.correctOptionId == obj.givenAnswer) {
                 totalMarksScored = totalMarksScored + rbMultipleAnswers.marks
+                System.out.println("totalMarksScored.."+totalMarksScored)
+                log.info("totalMarksScored.."+totalMarksScored)
             }
         }
+        System.out.println("maxMarks.."+maxMarks.toInteger())
+        log.info("maxMarks.."+maxMarks.toInteger())
         int percentage = totalMarksScored / maxMarks.toInteger() * 100
+        System.out.println("percentage.."+percentage)
+        log.info("percentage.."+percentage)
         String result
+        System.out.println("percentagethreshold.."+percentagethreshold.toInteger())
+        log.info("percentagethreshold.."+percentagethreshold.toInteger())
         if (percentage > percentagethreshold.toInteger()) {
             result = "pass"
         } else {
@@ -305,6 +319,8 @@ class StudentService {
                 totalPercentage: percentage,
                 overallResult: result
         )
+        System.out.println("topicid and userid..."+rbStudentAnswers.get(0).topicId +"and"+rbStudentAnswers.get(0).userId)
+        log.info("topicid and userid..."+rbStudentAnswers.get(0).topicId +"and"+rbStudentAnswers.get(0).userId)
         rbStudentReportRepo.save(rbStudentReport)
 
     }
