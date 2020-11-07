@@ -15,6 +15,7 @@ import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
 import com.brainup.readby.dao.entity.UserDetails
+import com.brainup.readby.dao.entity.UserLoginDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.dao.repository.MasBoardRepo
@@ -32,6 +33,7 @@ import com.brainup.readby.dao.repository.RbStudentAnswersRepo
 import com.brainup.readby.dao.repository.RbStudentReportRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
+import com.brainup.readby.dao.repository.UserLoginDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
 import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasBoardDTO
@@ -69,6 +71,9 @@ class StudentService {
 
     @Autowired
     UserDetailsRepo userDetailsRepo
+
+    @Autowired
+    UserLoginDetailsRepo userLoginDetailsRepo
 
     @Autowired
     MasBoardRepo masBoardRepo
@@ -226,7 +231,7 @@ class StudentService {
                 RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
                 RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
                 if (rbStudentStudyStateDao != null) {
-                    System.out.println("Student study state id: "+rbStudentStudyStateDao.stateId)
+                    System.out.println("Student study state id: " + rbStudentStudyStateDao.stateId)
                     rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
                     System.out.println(rbStudentStudyStateDTO.stateId)
                     rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
@@ -237,7 +242,7 @@ class StudentService {
                 MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
                 List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamId(us.streamId)
                 MasStreamDTO masStreamDTO = new MasStreamDTO()
-                if(masStreamDTO != null) {
+                if (masStreamDTO != null) {
                     masStreamDTO.streamId = masStreamDao.streamId
                     masStreamDTO.streamName = masStreamDao.streamName
                     masStreamDTO.streamCode = masStreamDao.streamCode
@@ -248,7 +253,7 @@ class StudentService {
                 us.masCourseYear = masCourseYearDao
                 MasBoard masBoardDao = masBoardRepo.findByBoardId(us.boardId)
                 MasBoardDTO masBoardDTO = new MasBoardDTO()
-                if(masBoardDao != null) {
+                if (masBoardDao != null) {
                     masBoardDTO.boardId = masBoardDao.boardId
                     masBoardDTO.boardName = masBoardDao.boardName
                     masBoardDTO.boardCode = masBoardDao.boardCode
@@ -256,7 +261,7 @@ class StudentService {
                 us.masBoard = masBoardDTO
                 MasCourses masCoursesDao = masCoursesRepo.findByCourseId(us.courseId)
                 MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
-                if(masCoursesDao != null) {
+                if (masCoursesDao != null) {
                     masCoursesDTO.courseId = masCoursesDao.courseId
                     masCoursesDTO.courseName = masCoursesDao.courseName
                     masCoursesDTO.courseCode = masCoursesDao.courseCode
@@ -284,28 +289,28 @@ class StudentService {
     def RbStudentReport saveStudentAnswer(List<RbStudentAnswers> rbStudentAnswers) {
         int totalMarksScored = 0
         List<RbStudentAnswers> rbStudentAnswered = rbStudentAnswersRepo.saveAll(rbStudentAnswers)
-        System.out.println("List of student answer.."+rbStudentAnswered.size())
-        log.info("List of student answer.."+rbStudentAnswered.size())
+        System.out.println("List of student answer.." + rbStudentAnswered.size())
+        log.info("List of student answer.." + rbStudentAnswered.size())
         for (RbStudentAnswers obj : rbStudentAnswered) {
-            System.out.println("findByQuestionId...."+obj.questionId)
-            log.info("findByQuestionId...."+obj.questionId)
+            System.out.println("findByQuestionId...." + obj.questionId)
+            log.info("findByQuestionId...." + obj.questionId)
             RbMultipleAnswers rbMultipleAnswers = rbMultipleAnswersRepo.findByQuestionId(obj.questionId)
-            System.out.println("rbMultipleAnswers.correctOptionId.."+rbMultipleAnswers.correctOptionId+"obj.givenAnswer"+obj.givenAnswer)
-            log.info("rbMultipleAnswers.correctOptionId.."+rbMultipleAnswers.correctOptionId+"obj.givenAnswer"+obj.givenAnswer)
+            System.out.println("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOptionId + "obj.givenAnswer" + obj.givenAnswer)
+            log.info("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOptionId + "obj.givenAnswer" + obj.givenAnswer)
             if (rbMultipleAnswers.correctOptionId == obj.givenAnswer) {
                 totalMarksScored = totalMarksScored + rbMultipleAnswers.marks
-                System.out.println("totalMarksScored.."+totalMarksScored)
-                log.info("totalMarksScored.."+totalMarksScored)
+                System.out.println("totalMarksScored.." + totalMarksScored)
+                log.info("totalMarksScored.." + totalMarksScored)
             }
         }
-        System.out.println("maxMarks.."+maxMarks.toInteger())
-        log.info("maxMarks.."+maxMarks.toInteger())
+        System.out.println("maxMarks.." + maxMarks.toInteger())
+        log.info("maxMarks.." + maxMarks.toInteger())
         int percentage = totalMarksScored / maxMarks.toInteger() * 100
-        System.out.println("percentage.."+percentage)
-        log.info("percentage.."+percentage)
+        System.out.println("percentage.." + percentage)
+        log.info("percentage.." + percentage)
         String result
-        System.out.println("percentagethreshold.."+percentagethreshold.toInteger())
-        log.info("percentagethreshold.."+percentagethreshold.toInteger())
+        System.out.println("percentagethreshold.." + percentagethreshold.toInteger())
+        log.info("percentagethreshold.." + percentagethreshold.toInteger())
         if (percentage > percentagethreshold.toInteger()) {
             result = "pass"
         } else {
@@ -319,8 +324,8 @@ class StudentService {
                 totalPercentage: percentage,
                 overallResult: result
         )
-        System.out.println("topicid and userid..."+rbStudentAnswers.get(0).topicId +"and"+rbStudentAnswers.get(0).userId)
-        log.info("topicid and userid..."+rbStudentAnswers.get(0).topicId +"and"+rbStudentAnswers.get(0).userId)
+        System.out.println("topicid and userid..." + rbStudentAnswers.get(0).topicId + "and" + rbStudentAnswers.get(0).userId)
+        log.info("topicid and userid..." + rbStudentAnswers.get(0).topicId + "and" + rbStudentAnswers.get(0).userId)
         rbStudentReportRepo.save(rbStudentReport)
 
     }
@@ -350,6 +355,39 @@ class StudentService {
         masTopic.videoStatus = map.get("VIDEO_STATUS").toString()
         masTopic.testStatus = map.get("TEST_STATUS").toString()
         masTopicRepo.save(masTopic)
+
+    }
+
+    def boolean getLoginDetail(Map<String, String> map) {
+
+        UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
+        if (userLoginDetails == null) {
+            UserDetails userDetails = userDetailsRepo.findTopByMobileNoOrderByUseridDesc(map.get("mobileNo").toLong())
+            UserLoginDetails uld = new UserLoginDetails(
+                    userid: userDetails.userid,
+                    mobileNo: map.get("mobileNo").toLong(),
+                    createdBy: "readby",
+                    loginFlag: "t"
+            )
+            userLoginDetailsRepo.save(uld)
+            true
+        } else if (userLoginDetails.loginFlag.equalsIgnoreCase("f")) {
+            userLoginDetails.loginFlag = "t"
+            userLoginDetails.updatedBy = "readby"
+            userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
+            userLoginDetailsRepo.save(userLoginDetails)
+            true
+        } else {
+            false
+        }
+    }
+
+    def UserLoginDetails getLogoutDetail(Map<String, String> map) {
+        UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
+        userLoginDetails.loginFlag = "f"
+        userLoginDetails.updatedBy = "readby"
+        userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
+        return userLoginDetailsRepo.save(userLoginDetails)
 
     }
 }

@@ -40,7 +40,7 @@ class ServiceCall {
 
     private SMSResponse callPublisher(String addressForUrl, Map<String, String> map){
         log.info "Calling service on url :${url}"
-        return restTemplate.getForObject("${url}message=Your OTP IS ${map.get("randomPIN")}&senderId=TBTSIG&routeId=8&mobileNos=${map.get("mobileNo")}&smsContentType=english", SMSResponse.class,map)
+        return restTemplate.getForObject("${url}message=Your OTP IS ${map.get("randomPIN")}&senderId=READBY&routeId=8&mobileNos=${map.get("mobileNo")}&smsContentType=english", SMSResponse.class,map)
     }
 }
 
