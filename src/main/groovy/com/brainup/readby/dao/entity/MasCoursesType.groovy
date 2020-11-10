@@ -12,6 +12,7 @@ import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.Id
 import javax.persistence.OneToMany
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Canonical
@@ -37,6 +38,8 @@ class MasCoursesType implements Serializable{
     private String isActive
 
     @OneToMany(mappedBy = "masCoursesType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'MAS_COURSES')
     private List<MasCourses> masCourses
+/*
+    @OneToOne(mappedBy = "masCoursesType")
+    private MasCourses masCourses*/
 }

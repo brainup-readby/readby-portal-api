@@ -22,6 +22,7 @@ class MasStream implements Serializable{
 
     @Id
     @Column(name = 'STREAM_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'STREAM_ID')
     private Long streamId
 
@@ -57,8 +58,9 @@ class MasStream implements Serializable{
     @JsonIgnore
     private String updatedBy
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_ID"), name = "COURSE_ID",insertable = false,updatable = false)
+    @ManyToOne
+    @JoinColumn( name = "COURSE_ID")
+   // @MapsId("COURSE_ID")
     private MasCourses masCourses
 
     /*@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)

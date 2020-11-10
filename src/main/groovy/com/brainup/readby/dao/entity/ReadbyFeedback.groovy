@@ -8,41 +8,52 @@ import lombok.Getter
 import lombok.Setter
 import lombok.ToString
 
-import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
 import javax.persistence.Table
 import java.sql.Timestamp
 
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_boards')
+@Table(name = 'readby_feedback')
 @Getter
 @Setter
 @ToString
-class MasBoard implements Serializable{
+class ReadbyFeedback implements Serializable{
 
     @Id
-    @Column(name = 'BOARD_ID')
-    @JsonProperty(value = 'BOARD_ID')
-    private Long boardId
+    @Column(name = 'FEEDBACK_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @JsonProperty(value = 'FEEDBACK_ID')
+    private Long feedbackId
 
-    @Column(name = 'BOARD_NAME')
-    @JsonProperty(value = 'BOARD_NAME')
-    private String boardName
+    @Column(name = 'MOBILE_NO')
+    @JsonProperty(value = 'MOBILE_NO')
+    private Long mobileNo
 
-    @Column(name = 'BOARD_CODE')
-    @JsonProperty(value = 'BOARD_CODE')
-    private String boardCode
+    @Column(name = 'USER_ID')
+    @JsonProperty(value = 'USER_ID')
+    private Long userId
 
-    @Column(name = 'IS_ACTIVE')
-    @JsonProperty(value = 'IS_ACTIVE')
-    private String isActive
+    @Column(name = 'LEARNING')
+    @JsonProperty(value = 'LEARNING')
+    private Integer learning
+
+    @Column(name = 'USABILITY')
+    @JsonProperty(value = 'USABILITY')
+    private Integer usability
+
+    @Column(name = 'CONTENT')
+    @JsonProperty(value = 'CONTENT')
+    private Integer content
+
+    @Column(name = 'COMMENTS')
+    @JsonProperty(value = 'COMMENTS')
+    private String comments
 
     @Column(name = 'CREATED_AT')
     @JsonProperty(value = 'CREATED_AT')
@@ -63,9 +74,4 @@ class MasBoard implements Serializable{
     @JsonProperty(value = 'UPDATED_BY')
     @JsonIgnore
     private String updatedBy
-
-    @OneToMany(mappedBy = "masBoard", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'MAS_COURSE')
-    private List<MasCourses> masCourse
-
 }

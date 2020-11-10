@@ -10,6 +10,7 @@ import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
+import com.brainup.readby.dao.entity.ReadbyFeedback
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.dao.entity.UserTransactionDetails
@@ -324,6 +325,19 @@ class ReadByRestController {
             MasTopic masTopic = studentService.updateTopicFlag(map)
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = masTopic
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        }catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/saveFeedBack")
+    ResponseEntity saveFeedBack(@RequestBody ReadbyFeedback readbyFeedback) {
+        try {
+            ReadbyFeedback readbyFeedbackDB = studentService.saveFeedBack(readbyFeedback)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = readbyFeedbackDB
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         }catch (Exception e) {
             log.error " ${e.message}"

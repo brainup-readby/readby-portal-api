@@ -20,8 +20,17 @@ class MasCourses implements Serializable{
 
     @Id
     @Column(name = 'COURSE_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'COURSE_ID')
     private Long courseId
+
+    @Column(name = 'BOARD_ID')
+    @JsonProperty(value = 'BOARD_ID')
+    private Long boardId
+
+    @Column(name = 'COURSE_TYPE_ID')
+    @JsonProperty(value = 'COURSE_TYPE_ID')
+    private Long courseTypeId
 
     @Column(name = 'COURSE_CODE')
     @JsonProperty(value = 'COURSE_CODE')
@@ -65,9 +74,15 @@ class MasCourses implements Serializable{
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_TYPE_ID"), name = "COURSE_TYPE_ID",insertable = false,updatable = false)
+    @JsonProperty(value = 'MAS_COURSE_TYPE')
     private MasCoursesType masCoursesType
 
-    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+   /* @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "COURSE_TYPE_ID", referencedColumnName = "COURSE_TYPE_ID")
+    @JsonProperty(value = 'MAS_COURSE_TYPE')
+    private MasCoursesType masCoursesType
+*/
+    @OneToMany(mappedBy = "masCourses" ,fetch=FetchType.LAZY,cascade = CascadeType.ALL,targetEntity = MasStream.class)
     @JsonProperty(value = 'MAS_STREAM')
     private List<MasStream> masStream
 

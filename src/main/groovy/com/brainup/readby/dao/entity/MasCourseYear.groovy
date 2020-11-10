@@ -12,6 +12,8 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.ForeignKey
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
@@ -28,6 +30,7 @@ class MasCourseYear implements Serializable{
 
     @Id
     @Column(name = 'YEAR_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'YEAR_ID')
     private Long yearId
 
@@ -35,8 +38,8 @@ class MasCourseYear implements Serializable{
     @JsonProperty(value = 'YEAR')
     private Long year
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "COURSE_ID"), name = "COURSE_ID",insertable = false,updatable = false)
+    @ManyToOne
+    @JoinColumn( name = "COURSE_ID")
     private MasCourses masCourses
 
     @Column(name = 'DISPLAY_NAME')

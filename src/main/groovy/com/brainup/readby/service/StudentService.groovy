@@ -14,6 +14,7 @@ import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
+import com.brainup.readby.dao.entity.ReadbyFeedback
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserLoginDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
@@ -32,6 +33,7 @@ import com.brainup.readby.dao.repository.RbQuestionnairesRepo
 import com.brainup.readby.dao.repository.RbStudentAnswersRepo
 import com.brainup.readby.dao.repository.RbStudentReportRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
+import com.brainup.readby.dao.repository.ReadbyFeedbackRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserLoginDetailsRepo
 import com.brainup.readby.dao.repository.UserSubscriptionsRepo
@@ -113,6 +115,9 @@ class StudentService {
 
     @Autowired
     RbStudentReportRepo rbStudentReportRepo
+
+    @Autowired
+    ReadbyFeedbackRepo readbyFeedbackRepo
 
     @Value('${readby.otp.url}')
     private String otpUrl
@@ -389,5 +394,9 @@ class StudentService {
         userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
         return userLoginDetailsRepo.save(userLoginDetails)
 
+    }
+
+    def ReadbyFeedback saveFeedBack(ReadbyFeedback readbyFeedback) {
+        readbyFeedbackRepo.save(readbyFeedback)
     }
 }
