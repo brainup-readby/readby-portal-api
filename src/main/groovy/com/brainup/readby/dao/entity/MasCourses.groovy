@@ -82,7 +82,7 @@ class MasCourses implements Serializable{
     @JsonProperty(value = 'MAS_COURSE_TYPE')
     private MasCoursesType masCoursesType
 */
-    @OneToMany(mappedBy = "masCourses" ,fetch=FetchType.LAZY,cascade = CascadeType.ALL,targetEntity = MasStream.class)
+    @OneToMany(mappedBy = "masCourses" ,fetch=FetchType.LAZY,cascade = CascadeType.ALL)
     @JsonProperty(value = 'MAS_STREAM')
     private List<MasStream> masStream
 

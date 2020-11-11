@@ -16,4 +16,11 @@ student.percentagethreshold: 70
 readby.mid: oBKImO82025244498334
 readby.mkey: omDHo8wTS!Wi1ayH
 
+amazonProperties:
+  endpointUrl: https://readbyicons.s3.ap-south-1.amazonaws.com
+  accessKey:  AKIAUM2PIM5FWGJ5Q4E2
+  secretKey:  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
+  bucketName:  readbyicons
+  childFolder: imagesFromAdmin
+
 readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&

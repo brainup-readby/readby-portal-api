@@ -1,10 +1,12 @@
 package com.brainup.readby.service
 
 import com.brainup.readby.dao.entity.MasBoard
+import com.brainup.readby.dao.entity.MasBoardDP
 import com.brainup.readby.dao.entity.MasCourseYear
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
+import com.brainup.readby.dao.repository.MasBoardDPRepo
 import com.brainup.readby.dao.repository.MasBoardRepo
 import com.brainup.readby.dao.repository.MasChapterRepo
 import com.brainup.readby.dao.repository.MasCourseYearRepo
@@ -14,13 +16,23 @@ import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
+import com.brainup.readby.util.AmazonClient
+import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 @Slf4j
 class AdminService {
+
+    private AmazonClient amazonClient;
+
+    @Autowired
+    BucketController(AmazonClient amazonClient) {
+        this.amazonClient = amazonClient;
+    }
 
     @Autowired
     UserDetailsRepo userDetailsRepo
@@ -47,7 +59,7 @@ class AdminService {
     MasCoursesTypeRepo masCoursesTypeRepo
 
     @Autowired
-    MasBoardRepo masBoardRepo
+    MasBoardDPRepo masBoardDPRepo
 
     def Map<String, Long> getDashBoardDetail() {
         Map<String, Long> map = new LinkedHashMap<>()
@@ -79,10 +91,37 @@ class AdminService {
 
     }
 
-    def MasCourses addCourses(MasCourses masCourses) {
+    def MasCourses addCourses(MultipartFile file,String masCourse) {
+        String fileurl = this.amazonClient.uploadFile(file)
+        log.info "fileurl: ${fileurl}"
+        MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
+        masCourses.iconPath = fileurl
+        return saveMasCourses(masCourses)
+
+    }
+
+    def List<MasCoursesType> getCourseType() {
+        masCoursesTypeRepo.findAll()
+    }
+
+    def List<MasBoardDP> getBoardList() {
+        masBoardDPRepo.findAll()
+    }
+
+    def MasCourses editCourses(MultipartFile file, String masCourse) {
+        MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
+        String fileurl = masCourses.iconPath
+        if(file!=null && file.size > 0)
+         fileurl = this.amazonClient.uploadFile(file)
+        log.info "fileurl: ${fileurl}"
+        masCourses.iconPath = fileurl
+        return saveMasCourses(masCourses)
+    }
+
+    def MasCourses saveMasCourses(MasCourses masCourses) {
 
         MasCourses masCoursesDB = masCoursesRepo.save(masCourses)
-        List<MasStream> masStreamList = masCoursesDB.masStream
+        List<MasStream> masStreamList = masCourses.masStream
         for (MasStream ms : masStreamList) {
             ms.masCourses = masCoursesDB
             masStreamRepo.save(ms)
@@ -96,11 +135,14 @@ class AdminService {
         masCoursesDB
     }
 
-    def List<MasCoursesType> getCourseType() {
-        masCoursesTypeRepo.findAll()
-    }
-
-    def List<MasBoard> getBoardList() {
-        masBoardRepo.findAll()
+    def String deleteCourse(long courseId) {
+        try {
+            log.info "Deleting course record for course id ${courseId}"
+            masCoursesRepo.deleteByCourseId(courseId)
+            "Successfully deleted record for course id ${courseId}"
+        }catch(Exception ex){
+            log.error(ex)
+            log.error "Exception occured while deleting course record for course id ${courseId}"
+        }
     }
 }

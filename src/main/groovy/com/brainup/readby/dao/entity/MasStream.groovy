@@ -60,7 +60,6 @@ class MasStream implements Serializable{
 
     @ManyToOne
     @JoinColumn( name = "COURSE_ID")
-   // @MapsId("COURSE_ID")
     private MasCourses masCourses
 
     /*@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
