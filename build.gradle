@@ -35,6 +35,7 @@ dependencies {
 	compile group: 'com.paytm', name: 'paytm-checksum', version: '1.2.0'
 	compile group: 'org.json', name: 'json', version: '20200518'
 	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.133'
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.0'
 
 	//compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.0.RELEASE'
 	//compile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.3.1.RELEASE'

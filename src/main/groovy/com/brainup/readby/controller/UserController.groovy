@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.stream.Collectors
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @Slf4j
 public class UserController {
 
