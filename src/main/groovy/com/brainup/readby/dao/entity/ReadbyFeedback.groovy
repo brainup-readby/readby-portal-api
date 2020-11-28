@@ -49,7 +49,7 @@ class ReadbyFeedback implements Serializable{
 
     @Column(name = 'CONTENT')
     @JsonProperty(value = 'CONTENT')
-    private Integer content
+    private String content
 
     @Column(name = 'COMMENTS')
     @JsonProperty(value = 'COMMENTS')

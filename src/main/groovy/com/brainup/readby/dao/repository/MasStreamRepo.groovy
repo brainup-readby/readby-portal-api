@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 interface MasStreamRepo extends JpaRepository<MasStream,Long> {
 
     MasStream findByStreamId(long streamId)
+
+    def List<MasStream> findByIsActiveIgnoreCase(String isActive)
 }

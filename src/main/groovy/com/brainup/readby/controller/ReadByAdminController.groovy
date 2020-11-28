@@ -4,11 +4,15 @@ import com.brainup.readby.config.ResponseObject
 import com.brainup.readby.dao.entity.MasBoardDP
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
+import com.brainup.readby.dao.entity.MasStream
+import com.brainup.readby.dao.entity.MasStreamLkp
+import com.brainup.readby.dao.entity.MasYearLkp
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.AdminService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -51,14 +55,15 @@ class ReadByAdminController {
         }
     }
 
-    @PostMapping(value = "/addCourses")
-    ResponseEntity addCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
+    @PostMapping(value = "/addCourses",consumes = "multipart/form-data",produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> addCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
         try {
             log.info "calling addCourses service for admin."
             MasCourses masCoursesDB = adminService.addCourses(file, masCourses)
-            ResponseObject responseObject = new ResponseObject()
-            responseObject.data = masCoursesDB
-            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+           // ResponseObject responseObject = new ResponseObject()
+           // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("course added successfully",HttpStatus.CREATED)
 
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -66,14 +71,16 @@ class ReadByAdminController {
         }
     }
 
-    @PostMapping(value = "/editCourses")
-    ResponseEntity editCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
+    @PostMapping(value = "/editCourses",consumes = "multipart/form-data",produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> editCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
         try {
             log.info "calling editCourses service for admin."
             MasCourses masCoursesDB = adminService.editCourses(file, masCourses)
-            ResponseObject responseObject = new ResponseObject()
-            responseObject.data = masCoursesDB
-            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+           // ResponseObject responseObject = new ResponseObject()
+           // responseObject.data = masCoursesDB
+          //  ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("course edited successfully",HttpStatus.CREATED)
+
 
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -118,6 +125,36 @@ class ReadByAdminController {
             List<MasBoardDP> masBoardList = adminService.getBoardList()
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = masBoardList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getMasStreamList")
+    ResponseEntity getMasStreamList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getMasStreamList service for admin."
+            List<MasStreamLkp> masStreamList = adminService.getMasStreamList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masStreamList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getMasYearList")
+    ResponseEntity getMasYearList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getMasStreamList service for admin."
+            List<MasYearLkp> masYearLkpList = adminService.getMasYearList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masYearLkpList
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
 
         } catch (Exception e) {

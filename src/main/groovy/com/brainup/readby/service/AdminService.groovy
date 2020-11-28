@@ -6,15 +6,19 @@ import com.brainup.readby.dao.entity.MasCourseYear
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
+import com.brainup.readby.dao.entity.MasStreamLkp
+import com.brainup.readby.dao.entity.MasYearLkp
 import com.brainup.readby.dao.repository.MasBoardDPRepo
 import com.brainup.readby.dao.repository.MasBoardRepo
 import com.brainup.readby.dao.repository.MasChapterRepo
 import com.brainup.readby.dao.repository.MasCourseYearRepo
 import com.brainup.readby.dao.repository.MasCoursesRepo
 import com.brainup.readby.dao.repository.MasCoursesTypeRepo
+import com.brainup.readby.dao.repository.MasStreamLkpRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.MasTopicRepo
+import com.brainup.readby.dao.repository.MasYearLkpRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -61,6 +65,12 @@ class AdminService {
     @Autowired
     MasBoardDPRepo masBoardDPRepo
 
+    @Autowired
+    MasStreamLkpRepo masStreamLkpRepo
+
+    @Autowired
+    MasYearLkpRepo masYearLkpRepo
+
     def Map<String, Long> getDashBoardDetail() {
         Map<String, Long> map = new LinkedHashMap<>()
         long userCount = userDetailsRepo.count()
@@ -87,7 +97,7 @@ class AdminService {
 
     def List<MasCourses> getCourseList() {
 
-        masCoursesRepo.findAll()
+        masCoursesRepo.findByIsActive("t")
 
     }
 
@@ -144,5 +154,13 @@ class AdminService {
             log.error(ex)
             log.error "Exception occured while deleting course record for course id ${courseId}"
         }
+    }
+
+    def List<MasStreamLkp> getMasStreamList() {
+        masStreamLkpRepo.findByIsActiveIgnoreCase("t")
+    }
+
+    def List<MasYearLkp> getMasYearList() {
+        masYearLkpRepo.findByIsActiveIgnoreCase("t")
     }
 }
