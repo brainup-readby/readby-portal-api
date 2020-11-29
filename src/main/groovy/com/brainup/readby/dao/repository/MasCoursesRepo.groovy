@@ -13,6 +13,10 @@ interface MasCoursesRepo  extends JpaRepository<MasCourses,Long> {
 
     @Transactional
     void deleteByCourseId(long l)
-
+    
     def List<MasCourses> findByIsActive(String isActive)
+
+
+
+    def List<MasCourses> findByIsActiveOrderByCourseIdDesc(String isActive)
 }

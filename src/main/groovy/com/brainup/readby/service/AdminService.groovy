@@ -97,7 +97,7 @@ class AdminService {
 
     def List<MasCourses> getCourseList() {
 
-        masCoursesRepo.findByIsActive("t")
+        masCoursesRepo.findByIsActiveOrderByCourseIdDesc("t")
 
     }
 

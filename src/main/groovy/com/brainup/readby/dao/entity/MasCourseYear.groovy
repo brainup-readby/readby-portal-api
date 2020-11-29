@@ -46,4 +46,8 @@ class MasCourseYear implements Serializable{
     @JsonProperty(value = 'DISPLAY_NAME')
     private String displayName
 
+    @Column(name = 'IS_ACTIVE')
+    @JsonProperty(value = 'IS_ACTIVE')
+    private String isActive
+
 }
