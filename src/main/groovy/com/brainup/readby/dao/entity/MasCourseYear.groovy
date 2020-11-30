@@ -38,10 +38,6 @@ class MasCourseYear implements Serializable{
     @JsonProperty(value = 'YEAR')
     private Long year
 
-    @ManyToOne
-    @JoinColumn( name = "COURSE_ID")
-    private MasCourses masCourses
-
     @Column(name = 'DISPLAY_NAME')
     @JsonProperty(value = 'DISPLAY_NAME')
     private String displayName
@@ -50,4 +46,7 @@ class MasCourseYear implements Serializable{
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn( name = "COURSE_ID")
+    private MasCourses masCourses
 }

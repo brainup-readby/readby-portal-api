@@ -336,12 +336,12 @@ class StudentService {
     }
 
     def UserTransactionDetails saveUserTransaction(UserTransactionDetails userTransactionDetails) {
-        String orderId = "Order1234555565"//"readby" + readByUtil.getRandomNumberString()
+        String orderId = "readby_" + readByUtil.getRandomNumberString()
         userTransactionDetails.orderId = orderId
         userTransactionDetails.createdBy = "read_by"
         userTransactionDetails.updatedBy = "read_by"
         UserTransactionDetails ut = userTransactionDetailsRepo.save(userTransactionDetails)
-        String checksum = readByUtil.paytmChecksum(mid, orderId, mkey)
+        String checksum = readByUtil.paytmChecksum(mid, orderId, mkey,userTransactionDetails.userid, userTransactionDetails.transactionAmount)
         ut.checksumVal = checksum
         UserTransactionDetails utdb = userTransactionDetailsRepo.save(userTransactionDetails)
         return utdb

@@ -28,9 +28,9 @@ class UserTransactionDetails implements Serializable {
     @JsonProperty(value = 'ORDER_ID')
     private String orderId
 
-    @Column(name = 'PAY_GWAY_TRANS_ID')
+    /*@Column(name = 'PAY_GWAY_TRANS_ID')
     @JsonProperty(value = 'PAY_GWAY_TRANS_ID')
-    private String payGwayTransId
+    private String payGwayTransId*/
 
     @Column(name = 'CREATED_AT')
     @JsonProperty(value = 'CREATED_AT')
@@ -56,9 +56,13 @@ class UserTransactionDetails implements Serializable {
     @JsonProperty(value = 'USER_ID')
     private Long userid
 
-    @Column(name = 'COURSE_STREAM_ID')
-    @JsonProperty(value = 'COURSE_STREAM_ID')
-    private Long courseStreamId
+    @Column(name = 'COURSE_ID')
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
+
+    @Column(name = 'SUBJECT_ID')
+    @JsonProperty(value = 'SUBJECT_ID')
+    private Long subjectId
 
     @Column(name = 'PAYMENT_STATUS')
     @JsonProperty(value = 'PAYMENT_STATUS')
@@ -66,10 +70,46 @@ class UserTransactionDetails implements Serializable {
 
     @Column(name = 'TRANSACTION_AMOUNT')
     @JsonProperty(value = 'TRANSACTION_AMOUNT')
-    private Long transactionAmount
+    private Double transactionAmount
 
     @Column(name = 'CHECKSUM_VAL')
     @JsonProperty(value = 'CHECKSUM_VAL')
     private String checksumVal
+
+    @Column(name = 'BANKNAME')
+    @JsonProperty(value = 'BANKNAME')
+    private String bankName
+
+    @Column(name = 'MID')
+    @JsonProperty(value = 'MID')
+    private String mid
+
+    @Column(name = 'TXNID')
+    @JsonProperty(value = 'TXNID')
+    private String txnId
+
+    @Column(name = 'RESPCODE')
+    @JsonProperty(value = 'RESPCODE')
+    private String respCode
+
+    @Column(name = 'PAYMENTMODE')
+    @JsonProperty(value = 'PAYMENTMODE')
+    private String paymentMode
+
+    @Column(name = 'BANKTXNID')
+    @JsonProperty(value = 'BANKTXNID')
+    private String bankTxnId
+
+    @Column(name = 'GATEWAYNAME')
+    @JsonProperty(value = 'GATEWAYNAME')
+    private String gatewayName
+
+    @Column(name = 'TXNDATE')
+    @JsonProperty(value = 'TXNDATE')
+    private Timestamp txnDate = new Timestamp(new Date().getTime())
+
+    @Column(name = 'CURRENCY')
+    @JsonProperty(value = 'CURRENCY')
+    private String currency
 
 }
