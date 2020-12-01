@@ -270,6 +270,7 @@ class StudentService {
                     masCoursesDTO.courseId = masCoursesDao.courseId
                     masCoursesDTO.courseName = masCoursesDao.courseName
                     masCoursesDTO.courseCode = masCoursesDao.courseCode
+                    masCoursesDTO.coursePrice = masCoursesDao.coursePrice
                 }
                 us.masCourses = masCoursesDTO
                 userSubscriptionsli.add(us)
@@ -348,8 +349,13 @@ class StudentService {
     }
 
     def UserTransactionDetails updateUserTransaction(UserTransactionDetails userTransactionDetails) {
-
-        return userTransactionDetailsRepo.save(userTransactionDetails)
+        Long subscriptionId = userTransactionDetails.subscriptionId
+        UserSubscriptions userSubscriptions = userSubscriptionsRepo.findBySubscriptionId(subscriptionId)
+        userSubscriptions.subscriptionFlag = "p"
+        userSubscriptionsRepo.save(userSubscriptions)
+        UserTransactionDetails ut =  userTransactionDetailsRepo.save(userTransactionDetails)
+        ut.subscriptionId = subscriptionId
+        return ut
     }
 
     def MasTopic updateTopicFlag(Map<String, String> map) {

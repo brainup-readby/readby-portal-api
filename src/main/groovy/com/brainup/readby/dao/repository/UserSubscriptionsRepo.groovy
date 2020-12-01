@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserSubscriptionsRepo extends JpaRepository<UserSubscriptions,Long> {
 
+    def UserSubscriptions findBySubscriptionId(long aLong)
 }

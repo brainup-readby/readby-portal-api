@@ -1,5 +1,6 @@
 package com.brainup.readby.dao.entity
 
+import com.brainup.readby.dto.MasCoursesDTO
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.Canonical
@@ -111,5 +112,9 @@ class UserTransactionDetails implements Serializable {
     @Column(name = 'CURRENCY')
     @JsonProperty(value = 'CURRENCY')
     private String currency
+
+    @Transient
+    @JsonProperty(value = "SUBSCRIPTION_ID")
+    private Long subscriptionId
 
 }

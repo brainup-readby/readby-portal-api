@@ -46,7 +46,7 @@ class MasCourseYear implements Serializable{
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn( name = "COURSE_ID")
     private MasCourses masCourses
 }

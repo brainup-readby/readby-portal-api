@@ -16,4 +16,7 @@ class MasCoursesDTO implements Serializable{
 
     @JsonProperty(value = 'COURSE_NAME')
     private String courseName
+
+    @JsonProperty(value = 'COURSE_PRICE')
+    private Long coursePrice
 }

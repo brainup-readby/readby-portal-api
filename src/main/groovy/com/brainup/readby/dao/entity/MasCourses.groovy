@@ -68,6 +68,10 @@ class MasCourses implements Serializable{
     @JsonProperty(value = 'icon_path')
     private String iconPath
 
+    @Column(name = 'COURSE_PRICE')
+    @JsonProperty(value = 'COURSE_PRICE')
+    private Long coursePrice
+
     /*@OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty(value = 'MAS_SUBJECTS')
     private List<MasSubjects> masSubjects*/
@@ -86,7 +90,7 @@ class MasCourses implements Serializable{
     @JsonProperty(value = 'MAS_STREAM')
     private List<MasStream> masStream
 
-    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JsonProperty(value = 'MAS_COURSE_YEAR')
     private List<MasCourseYear> masCourseYear
 

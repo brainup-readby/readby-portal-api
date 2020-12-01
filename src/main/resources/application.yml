@@ -1,9 +1,9 @@
 server.port: 8764
 
 # MySQL
-spring.datasource.url: jdbc:mysql://192.168.99.100:3306/readby
+spring.datasource.url: jdbc:mysql://localhost:3306/readby
 spring.datasource.username: root
-spring.datasource.password: admin
+spring.datasource.password: PA#310424pa
 spring.datasource.driver-class-name: com.mysql.jdbc.Driver
 spring.jpa.database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
@@ -16,6 +16,8 @@ student.percentagethreshold: 70
 readby.mid: oBKImO82025244498334
 readby.mkey: omDHo8wTS!Wi1ayH
 
+readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&
+
 amazonProperties:
   endpointUrl: https://readbyicons.s3.ap-south-1.amazonaws.com
   accessKey:  AKIAUM2PIM5FWGJ5Q4E2
@@ -23,4 +25,5 @@ amazonProperties:
   bucketName:  readbyicons
   childFolder: imagesFromAdmin
 
-readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&
+#readby.otp.url: http://66.70.200.51/rest/services/sendSMS/sendGroupSms?AUTH_KEY=e6a6267b33d8c568fb92aacd5edbeda1&
+payment.callback.url: https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=

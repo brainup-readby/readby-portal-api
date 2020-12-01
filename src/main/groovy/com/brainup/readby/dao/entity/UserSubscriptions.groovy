@@ -68,6 +68,10 @@ class UserSubscriptions implements Serializable{
     @JsonProperty(value = 'IS_EXPIRED')
     private String isExpired
 
+    @Column(name = 'SUBSCRIPTION_FLAG')
+    @JsonProperty(value = 'SUBSCRIPTION_FLAG')
+    private String subscriptionFlag
+
     /*@OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="COURSE_ID")
     @JsonProperty(value = 'MAS_COURSE')
