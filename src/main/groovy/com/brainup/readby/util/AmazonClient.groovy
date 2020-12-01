@@ -44,7 +44,7 @@ class AmazonClient {
         try {
             File file = convertMultiPartToFile(multipartFile)
             String fileName = generateFileName(multipartFile)
-            fileUrl = endpointUrl + "/" + bucketName + "/" + childFolder + "/" + fileName
+            fileUrl = endpointUrl + "/" + childFolder + "/" + fileName
             uploadFileTos3bucket(fileName, file)
             file.delete()
         } catch (Exception e) {
