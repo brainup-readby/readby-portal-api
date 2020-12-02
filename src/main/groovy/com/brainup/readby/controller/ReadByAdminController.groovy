@@ -7,6 +7,7 @@ import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
 import com.brainup.readby.dao.entity.MasYearLkp
+import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.AdminService
 import groovy.util.logging.Slf4j
@@ -155,6 +156,21 @@ class ReadByAdminController {
             List<MasYearLkp> masYearLkpList = adminService.getMasYearList()
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = masYearLkpList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getUserTransactionList")
+    ResponseEntity getUserTransactionList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getMasStreamList service for admin."
+            List<UserTransactionDetails> userTransactionDetails = adminService.getUserTransactionList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = userTransactionDetails
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
 
         } catch (Exception e) {

@@ -8,6 +8,8 @@ import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
 import com.brainup.readby.dao.entity.MasYearLkp
+import com.brainup.readby.dao.entity.UserDetails
+import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.dao.repository.MasBoardDPRepo
 import com.brainup.readby.dao.repository.MasBoardRepo
 import com.brainup.readby.dao.repository.MasChapterRepo
@@ -20,6 +22,9 @@ import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.MasYearLkpRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
+import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
+import com.brainup.readby.dto.MasCoursesDTO
+import com.brainup.readby.dto.UserDetailsDTO
 import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
@@ -40,6 +45,9 @@ class AdminService {
 
     @Autowired
     UserDetailsRepo userDetailsRepo
+
+    @Autowired
+    UserTransactionDetailsRepo userTransactionDetailsRepo
 
     @Autowired
     MasCoursesRepo masCoursesRepo
@@ -70,6 +78,7 @@ class AdminService {
 
     @Autowired
     MasYearLkpRepo masYearLkpRepo
+
 
     def Map<String, Long> getDashBoardDetail() {
         Map<String, Long> map = new LinkedHashMap<>()
@@ -162,5 +171,32 @@ class AdminService {
 
     def List<MasYearLkp> getMasYearList() {
         masYearLkpRepo.findByIsActiveIgnoreCase("t")
+    }
+
+    def List<UserTransactionDetails> getUserTransactionList() {
+        List<UserTransactionDetails> userTransactionDetailsList = userTransactionDetailsRepo.findAll()
+        List<UserTransactionDetails> utdli = new ArrayList<>()
+        for(UserTransactionDetails utd : userTransactionDetailsList){
+            MasCourses masCourses = masCoursesRepo.findByCourseId(utd.courseId)
+            MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
+            masCoursesDTO.courseId = masCourses.courseId
+            masCoursesDTO.courseCode = masCourses.courseCode
+            masCoursesDTO.courseName = masCourses.courseName
+            masCoursesDTO.coursePrice = masCourses.coursePrice
+            utd.masCourses = masCoursesDTO
+
+            UserDetails userDetails = userDetailsRepo.findByUserid(utd.userid)
+            UserDetailsDTO userDetailsDTO = new UserDetailsDTO()
+            userDetailsDTO.userName = userDetails.userName
+            userDetailsDTO.firstName = userDetails.firstName
+            userDetailsDTO.middleName = userDetails.middleName
+            userDetailsDTO.lastName = userDetails.lastName
+            userDetailsDTO.mobileNo = userDetails.mobileNo
+            userDetailsDTO.emailId = userDetails.emailId
+            utd.userDetails = userDetailsDTO
+            utdli.add(utd)
+
+        }
+        return utdli
     }
 }
