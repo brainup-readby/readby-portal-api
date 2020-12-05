@@ -1,6 +1,7 @@
 package com.brainup.readby.service
 
 import com.brainup.readby.dao.entity.MasBoard
+import com.brainup.readby.dao.entity.MasChapters
 import com.brainup.readby.dao.entity.MasCourseYear
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasGlobalConfig
@@ -8,6 +9,7 @@ import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.MasTopic
+import com.brainup.readby.dao.entity.MasTopicStatus
 import com.brainup.readby.dao.entity.OtpInfo
 import com.brainup.readby.dao.entity.RbMultipleAnswers
 import com.brainup.readby.dao.entity.RbQuestionnaires
@@ -27,6 +29,7 @@ import com.brainup.readby.dao.repository.MasRoleRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.MasTopicRepo
+import com.brainup.readby.dao.repository.MasTopicStatusRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
 import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
@@ -118,6 +121,9 @@ class StudentService {
 
     @Autowired
     ReadbyFeedbackRepo readbyFeedbackRepo
+
+    @Autowired
+    MasTopicStatusRepo masTopicStatusRepo
 
     @Value('${readby.otp.url}')
     private String otpUrl
@@ -246,6 +252,18 @@ class StudentService {
                 us.rbStudentStudyState = rbStudentStudyStateDTO
                 MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
                 List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamId(us.streamId)
+                for (MasSubjects masSubjects : masSubjectsList) {
+                    List<MasChapters> masChaptersList = masSubjects.masChapters
+                    for (MasChapters masChapters : masChaptersList) {
+                        List<MasTopic> masTopicList = masChapters.mastopic
+                        for (MasTopic masTopic : masTopicList) {
+                            MasTopicStatus masTopicStatus = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, us.userid)
+                            if (masTopicStatus != null) {
+                                masTopic.masTopicStatus = masTopicStatus
+                            }
+                        }
+                    }
+                }
                 MasStreamDTO masStreamDTO = new MasStreamDTO()
                 if (masStreamDTO != null) {
                     masStreamDTO.streamId = masStreamDao.streamId
@@ -342,7 +360,7 @@ class StudentService {
         userTransactionDetails.createdBy = "read_by"
         userTransactionDetails.updatedBy = "read_by"
         UserTransactionDetails ut = userTransactionDetailsRepo.save(userTransactionDetails)
-        String checksum = readByUtil.paytmChecksum(mid, orderId, mkey,userTransactionDetails.userid, userTransactionDetails.transactionAmount)
+        String checksum = readByUtil.paytmChecksum(mid, orderId, mkey, userTransactionDetails.userid, userTransactionDetails.transactionAmount)
         ut.checksumVal = checksum
         UserTransactionDetails utdb = userTransactionDetailsRepo.save(userTransactionDetails)
         return utdb
@@ -353,20 +371,19 @@ class StudentService {
         UserSubscriptions userSubscriptions = userSubscriptionsRepo.findBySubscriptionId(subscriptionId)
         userSubscriptions.subscriptionFlag = "p"
         userSubscriptionsRepo.save(userSubscriptions)
-        UserTransactionDetails ut =  userTransactionDetailsRepo.save(userTransactionDetails)
+        UserTransactionDetails ut = userTransactionDetailsRepo.save(userTransactionDetails)
         ut.subscriptionId = subscriptionId
         return ut
     }
 
-    def MasTopic updateTopicFlag(Map<String, String> map) {
-        System.out.println(map.get("TOPIC_ID"))
-        System.out.println(map.get("VIDEO_STATUS"))
-        System.out.println(map.get("TEST_STATUS"))
-        MasTopic masTopic = masTopicRepo.findByTopicId(map.get("TOPIC_ID").toLong())
-        masTopic.videoStatus = map.get("VIDEO_STATUS").toString()
-        masTopic.testStatus = map.get("TEST_STATUS").toString()
-        masTopicRepo.save(masTopic)
-
+    def MasTopicStatus updateTopicFlag(MasTopicStatus masTopic) {
+        masTopic.updatedBy = "read_by"
+        masTopic.updatedAt = new Timestamp(new Date().getTime())
+        if (masTopic.topicStatusId == null && masTopicStatusRepo.existsByTopicIdAndUserid(masTopic.topicId, masTopic.userid)) {
+            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
+        } else {
+            masTopicStatusRepo.save(masTopic)
+        }
     }
 
     def boolean getLoginDetail(Map<String, String> map) {

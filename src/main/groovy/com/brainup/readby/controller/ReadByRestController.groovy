@@ -6,6 +6,7 @@ import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasGlobalConfig
 import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasTopic
+import com.brainup.readby.dao.entity.MasTopicStatus
 import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
@@ -320,11 +321,11 @@ class ReadByRestController {
     }
 
     @PostMapping(value = "/updateTopicFlag")
-    ResponseEntity updateTopicFlag(@RequestBody Map<String, String> map) {
+    ResponseEntity updateTopicFlag(@RequestBody MasTopicStatus masTopic) {
         try {
-            MasTopic masTopic = studentService.updateTopicFlag(map)
+            MasTopicStatus masTopicDB = studentService.updateTopicFlag(masTopic)
             ResponseObject responseObject = new ResponseObject()
-            responseObject.data = masTopic
+            responseObject.data = masTopicDB
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         }catch (Exception e) {
             log.error " ${e.message}"

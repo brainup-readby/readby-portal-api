@@ -16,6 +16,7 @@ import javax.persistence.ForeignKey
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 import javax.persistence.Table
 import java.sql.Timestamp
 
@@ -85,11 +86,15 @@ class MasTopic implements Serializable{
     @JsonProperty(value = 'TOPIC_SUBSCRIPTION')
     private String topicSubscription
 
-    @Column(name = 'VIDEO_STATUS')
+    /*@Column(name = 'VIDEO_STATUS')
     @JsonProperty(value = 'VIDEO_STATUS')
     private String videoStatus
 
     @Column(name = 'TEST_STATUS')
     @JsonProperty(value = 'TEST_STATUS')
-    private String testStatus
+    private String testStatus*/
+
+    @OneToOne (mappedBy="masTopic")
+    @JsonProperty(value = 'MAS_TOPIC_STATUS')
+    private MasTopicStatus masTopicStatus
 }

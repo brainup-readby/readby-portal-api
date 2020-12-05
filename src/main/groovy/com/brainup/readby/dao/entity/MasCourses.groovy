@@ -6,6 +6,7 @@ import groovy.transform.Canonical
 import lombok.EqualsAndHashCode
 import lombok.Getter
 import lombok.Setter
+import lombok.ToString
 
 import javax.persistence.*
 import java.sql.Timestamp
@@ -16,6 +17,7 @@ import java.sql.Timestamp
 @Table(name = 'mas_courses')
 @Getter
 @Setter
+@ToString
 class MasCourses implements Serializable{
 
     @Id
