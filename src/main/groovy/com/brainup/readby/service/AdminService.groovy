@@ -29,6 +29,7 @@ import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
@@ -174,7 +175,7 @@ class AdminService {
     }
 
     def List<UserTransactionDetails> getUserTransactionList() {
-        List<UserTransactionDetails> userTransactionDetailsList = userTransactionDetailsRepo.findAll()
+        List<UserTransactionDetails> userTransactionDetailsList = userTransactionDetailsRepo.findAll(Sort.by(Sort.Direction.DESC,"userTransId"))
         List<UserTransactionDetails> utdli = new ArrayList<>()
         for(UserTransactionDetails utd : userTransactionDetailsList){
             MasCourses masCourses = masCoursesRepo.findByCourseId(utd.courseId)

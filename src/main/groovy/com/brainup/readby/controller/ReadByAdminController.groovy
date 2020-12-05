@@ -167,7 +167,7 @@ class ReadByAdminController {
     @GetMapping(value = "/getUserTransactionList")
     ResponseEntity getUserTransactionList(@RequestParam Map<String, String> map) {
         try {
-            log.info "calling getMasStreamList service for admin."
+            log.info "calling getUserTransactionList service for admin."
             List<UserTransactionDetails> userTransactionDetails = adminService.getUserTransactionList()
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = userTransactionDetails
