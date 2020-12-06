@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToOne
 import javax.persistence.Table
+import javax.persistence.Transient
 import java.sql.Timestamp
 
 @Canonical
@@ -94,7 +95,11 @@ class MasTopic implements Serializable{
     @JsonProperty(value = 'TEST_STATUS')
     private String testStatus*/
 
-    @OneToOne (mappedBy="masTopic")
+    /*@OneToOne (mappedBy="masTopic")
+    @JsonProperty(value = 'MAS_TOPIC_STATUS')
+    private MasTopicStatus masTopicStatus*/
+
+    @Transient
     @JsonProperty(value = 'MAS_TOPIC_STATUS')
     private MasTopicStatus masTopicStatus
 }

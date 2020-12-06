@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface MasTopicStatusRepo extends JpaRepository<MasTopicStatus,Long> {
 
-    MasTopicStatus findByTopicIdAndUserid(long aLong1, long aLong2)
-
     def boolean existsByTopicIdAndUserid(long aLong1, long aLong2)
+    
+    def MasTopicStatus findByTopicIdAndUserid(long topicId,long userId)
 }

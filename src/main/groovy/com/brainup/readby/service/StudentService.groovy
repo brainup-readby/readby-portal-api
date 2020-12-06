@@ -380,7 +380,8 @@ class StudentService {
         masTopic.updatedBy = "read_by"
         masTopic.updatedAt = new Timestamp(new Date().getTime())
         if (masTopic.topicStatusId == null && masTopicStatusRepo.existsByTopicIdAndUserid(masTopic.topicId, masTopic.userid)) {
-            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
+            //List<MasTopicStatus> li = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
+            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId,masTopic.userid)
         } else {
             masTopicStatusRepo.save(masTopic)
         }

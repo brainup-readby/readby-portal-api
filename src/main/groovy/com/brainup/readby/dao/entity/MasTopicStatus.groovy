@@ -73,8 +73,8 @@ class MasTopicStatus implements Serializable{
     @JsonIgnore
     private String updatedBy
 
-    @OneToOne
+    /*@OneToOne
     @JoinColumn (name="TOPIC_ID",insertable = false,updatable = false)
     //@JsonProperty(value = 'MAS_TOPIC_STATUS')
-    private MasTopic masTopic
+    private MasTopic masTopic*/
 }
