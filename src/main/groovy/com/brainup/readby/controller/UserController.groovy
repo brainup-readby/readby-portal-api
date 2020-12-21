@@ -34,9 +34,9 @@ public class UserController {
     @GetMapping(value = "/getLoginDetail")
     ResponseEntity getLoginDetail(@RequestParam Map<String, String> map) {
         try {
-            boolean loginFlag = studentService.getLoginDetail(map)
+            UserLoginDetails userLoginDetails = studentService.getLoginDetail(map)
             ResponseObject responseObject = new ResponseObject()
-            responseObject.data = loginFlag
+            responseObject.data = userLoginDetails
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         } catch (Exception e) {
             log.error " ${e.message}"

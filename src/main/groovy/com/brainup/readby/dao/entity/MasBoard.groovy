@@ -12,6 +12,8 @@ import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
@@ -30,6 +32,7 @@ class MasBoard implements Serializable{
     @Id
     @Column(name = 'BOARD_ID')
     @JsonProperty(value = 'BOARD_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long boardId
 
     @Column(name = 'BOARD_NAME')

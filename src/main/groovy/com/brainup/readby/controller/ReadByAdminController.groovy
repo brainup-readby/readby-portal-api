@@ -1,12 +1,14 @@
 package com.brainup.readby.controller
 
 import com.brainup.readby.config.ResponseObject
+import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasBoardDP
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
 import com.brainup.readby.dao.entity.MasYearLkp
+import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.AdminService
@@ -56,15 +58,15 @@ class ReadByAdminController {
         }
     }
 
-    @PostMapping(value = "/addCourses",consumes = "multipart/form-data",produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/addCourses", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
     ResponseEntity<Object> addCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
         try {
             log.info "calling addCourses service for admin."
             MasCourses masCoursesDB = adminService.addCourses(file, masCourses)
-           // ResponseObject responseObject = new ResponseObject()
-           // responseObject.data = "Uploaded"
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
             //ResponseEntity.status(HttpStatus.OK).body(responseObject)
-            return new ResponseEntity<Object>("course added successfully",HttpStatus.CREATED)
+            return new ResponseEntity<Object>("course added successfully", HttpStatus.CREATED)
 
         } catch (Exception e) {
             log.error " ${e.message}"
@@ -72,15 +74,15 @@ class ReadByAdminController {
         }
     }
 
-    @PostMapping(value = "/editCourses",consumes = "multipart/form-data",produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/editCourses", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
     ResponseEntity<Object> editCourses(@RequestParam("file") MultipartFile file, @RequestParam("masCourse") String masCourses) {
         try {
             log.info "calling editCourses service for admin."
             MasCourses masCoursesDB = adminService.editCourses(file, masCourses)
-           // ResponseObject responseObject = new ResponseObject()
-           // responseObject.data = masCoursesDB
-          //  ResponseEntity.status(HttpStatus.OK).body(responseObject)
-            return new ResponseEntity<Object>("course edited successfully",HttpStatus.CREATED)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = masCoursesDB
+            //  ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("course edited successfully", HttpStatus.CREATED)
 
 
         } catch (Exception e) {
@@ -178,4 +180,50 @@ class ReadByAdminController {
             throw new BadRequestException(e.message)
         }
     }
+
+    @PostMapping(value = "/saveBoard")
+    ResponseEntity saveBoard(@RequestBody MasBoard masBoard) {
+        try {
+            log.info "calling saveBoard service for admin."
+            MasBoard masBoard1 = adminService.saveBoard(masBoard)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masBoard1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/editBoard")
+    ResponseEntity editBoard(@RequestBody MasBoard masBoard) {
+        try {
+            log.info "calling editBoard service for admin."
+            MasBoard masBoard1 = adminService.editBoard(masBoard)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masBoard1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @DeleteMapping(value = "/deleteBoard")
+    ResponseEntity deleteBoard(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteBoard service for admin."
+            String msg = adminService.deleteBoard(map.get("boardId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
 }

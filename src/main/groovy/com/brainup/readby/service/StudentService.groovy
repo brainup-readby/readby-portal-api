@@ -44,6 +44,7 @@ import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
+import com.brainup.readby.dto.ProgressReport
 import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.brainup.readby.dto.SMSResponse
 import com.brainup.readby.proxy.ServiceCall
@@ -239,6 +240,10 @@ class StudentService {
             List<UserSubscriptions> userSubscriptionsli = new ArrayList<>()
             log.info "Number of user subscription ${userSubscriptions.size()}"
             for (UserSubscriptions us : userSubscriptions) {
+                int totalCount = 0
+                ProgressReport progressReport = new ProgressReport()
+                progressReport.subscriptionId = us.subscriptionId
+
                 RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
                 RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
                 if (rbStudentStudyStateDao != null) {
@@ -256,8 +261,9 @@ class StudentService {
                     List<MasChapters> masChaptersList = masSubjects.masChapters
                     for (MasChapters masChapters : masChaptersList) {
                         List<MasTopic> masTopicList = masChapters.mastopic
+                        totalCount = totalCount + masTopicList.size()
                         for (MasTopic masTopic : masTopicList) {
-                            MasTopicStatus masTopicStatus = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, us.userid)
+                            MasTopicStatus masTopicStatus = masTopicStatusRepo.findTopByTopicIdAndUseridOrderByTopicStatusIdDesc(masTopic.topicId, us.userid)
                             if (masTopicStatus != null) {
                                 masTopic.masTopicStatus = masTopicStatus
                             }
@@ -291,6 +297,12 @@ class StudentService {
                     masCoursesDTO.coursePrice = masCoursesDao.coursePrice
                 }
                 us.masCourses = masCoursesDTO
+
+                progressReport.totalCount = totalCount
+                List<MasTopicStatus> masTopicStatus = masTopicStatusRepo.findByUserid(us.userid)
+                progressReport.totalProgressCount = masTopicStatus.size()
+                progressReport.courseName = masCoursesDao.courseName
+                us.progressReport = progressReport
                 userSubscriptionsli.add(us)
             }
             userDetails.userSubscriptions = userSubscriptionsli
@@ -387,7 +399,7 @@ class StudentService {
         }
     }
 
-    def boolean getLoginDetail(Map<String, String> map) {
+    def UserLoginDetails getLoginDetail(Map<String, String> map) {
 
         UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
         if (userLoginDetails == null) {
@@ -396,18 +408,20 @@ class StudentService {
                     userid: userDetails.userid,
                     mobileNo: map.get("mobileNo").toLong(),
                     createdBy: "readby",
-                    loginFlag: "t"
+                    loginFlag: "t",
+                    token: map.get("token")
             )
             userLoginDetailsRepo.save(uld)
-            true
-        } else if (userLoginDetails.loginFlag.equalsIgnoreCase("f")) {
+           // true
+        } else if (!userLoginDetails.token.equalsIgnoreCase(map.get("token"))) {
             userLoginDetails.loginFlag = "t"
             userLoginDetails.updatedBy = "readby"
             userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
+            userLoginDetails.token = map.get("token")
             userLoginDetailsRepo.save(userLoginDetails)
-            true
+            //true
         } else {
-            false
+            userLoginDetails
         }
     }
 

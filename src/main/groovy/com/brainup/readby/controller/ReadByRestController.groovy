@@ -223,6 +223,7 @@ class ReadByRestController {
             } else if (studentService.existsByMobileNo(userSubscriptions.mobileNo)) {
                 UserDetails userDetailsDao = studentService.findByMobileNo(userSubscriptions.mobileNo)
                 userSubscriptions.userid = userDetailsDao.userid
+                userSubscriptions.subscriptionFlag = "u"
                 UserSubscriptions usdao = studentService.registerStudentSubscription(userSubscriptions)
                 ResponseObject responseObject = new ResponseObject()
                 responseObject.data = usdao

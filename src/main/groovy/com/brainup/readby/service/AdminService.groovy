@@ -33,6 +33,8 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
+import java.sql.Timestamp
+
 @Service
 @Slf4j
 class AdminService {
@@ -73,6 +75,9 @@ class AdminService {
 
     @Autowired
     MasBoardDPRepo masBoardDPRepo
+
+    @Autowired
+    MasBoardRepo masBoardRepo
 
     @Autowired
     MasStreamLkpRepo masStreamLkpRepo
@@ -199,5 +204,28 @@ class AdminService {
 
         }
         return utdli
+    }
+
+    def MasBoard saveBoard(MasBoard masBoard) {
+        masBoard.createdBy = "readby-admin"
+        masBoardRepo.save(masBoard)
+    }
+
+    def MasBoard editBoard(MasBoard masBoard) {
+        masBoard.updatedBy = "readby-admin"
+        masBoard.updatedAt = new Timestamp(new Date().getTime())
+        masBoardRepo.save(masBoard)
+    }
+
+    def String deleteBoard(long aLong) {
+        try {
+            log.info "Deleting board record for board id ${aLong}"
+            masBoardRepo.deleteByBoardId(aLong)
+            "Successfully deleted record for board id ${aLong}"
+        }catch(Exception ex){
+            log.error(ex)
+            log.error "Exception occured while deleting course record for course id ${aLong}"
+        }
+
     }
 }
