@@ -44,7 +44,6 @@ import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
-import com.brainup.readby.dto.ProgressReport
 import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.brainup.readby.dto.SMSResponse
 import com.brainup.readby.proxy.ServiceCall
@@ -240,10 +239,6 @@ class StudentService {
             List<UserSubscriptions> userSubscriptionsli = new ArrayList<>()
             log.info "Number of user subscription ${userSubscriptions.size()}"
             for (UserSubscriptions us : userSubscriptions) {
-                int totalCount = 0
-                ProgressReport progressReport = new ProgressReport()
-                progressReport.subscriptionId = us.subscriptionId
-
                 RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
                 RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
                 if (rbStudentStudyStateDao != null) {
@@ -261,7 +256,14 @@ class StudentService {
                     List<MasChapters> masChaptersList = masSubjects.masChapters
                     for (MasChapters masChapters : masChaptersList) {
                         List<MasTopic> masTopicList = masChapters.mastopic
-                        totalCount = totalCount + masTopicList.size()
+                        int totalCount =  masTopicList.size()
+                        List<MasTopicStatus> masTopicStatusList = masTopicStatusRepo.findBySubjectIdAndUserid(masSubjects.subjectId,us.userid)
+                        int progressCount = masTopicStatusList.size()
+                        if(totalCount != 0) {
+                            double percentage = progressCount / totalCount
+                            percentage = percentage*100
+                            masSubjects.percentage = percentage
+                        }
                         for (MasTopic masTopic : masTopicList) {
                             MasTopicStatus masTopicStatus = masTopicStatusRepo.findTopByTopicIdAndUseridOrderByTopicStatusIdDesc(masTopic.topicId, us.userid)
                             if (masTopicStatus != null) {
@@ -297,12 +299,6 @@ class StudentService {
                     masCoursesDTO.coursePrice = masCoursesDao.coursePrice
                 }
                 us.masCourses = masCoursesDTO
-
-                progressReport.totalCount = totalCount
-                List<MasTopicStatus> masTopicStatus = masTopicStatusRepo.findByUserid(us.userid)
-                progressReport.totalProgressCount = masTopicStatus.size()
-                progressReport.courseName = masCoursesDao.courseName
-                us.progressReport = progressReport
                 userSubscriptionsli.add(us)
             }
             userDetails.userSubscriptions = userSubscriptionsli

@@ -37,6 +37,10 @@ class MasTopicStatus implements Serializable{
     @JsonProperty(value = 'TOPIC_ID')
     private Long topicId
 
+    @Column(name = 'SUBJECT_ID')
+    @JsonProperty(value = 'SUBJECT_ID')
+    private Long subjectId
+
     @Column(name = 'USER_ID')
     @JsonProperty(value = 'USER_ID')
     private Long userid

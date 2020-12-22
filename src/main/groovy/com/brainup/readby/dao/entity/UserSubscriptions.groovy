@@ -3,7 +3,6 @@ package com.brainup.readby.dao.entity
 import com.brainup.readby.dto.MasBoardDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasStreamDTO
-import com.brainup.readby.dto.ProgressReport
 import com.brainup.readby.dto.RbStudentStudyStateDTO
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -118,9 +117,5 @@ class UserSubscriptions implements Serializable{
     @Column(name = 'INSTITUTION_NAME')
     @JsonProperty(value = 'INSTITUTION_NAME')
     private String institutionName
-
-    @Transient
-    @JsonProperty(value = "PROGRESS_REPORT")
-    ProgressReport progressReport
 
 }

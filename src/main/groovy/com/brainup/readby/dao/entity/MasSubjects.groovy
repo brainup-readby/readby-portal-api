@@ -85,5 +85,9 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'SUBJECT_PRICE')
     private Long subjectPrice
 
+    @Transient
+    @JsonProperty(value = "SUBJECT_PROGRESS")
+    private Double percentage
+
 
 }

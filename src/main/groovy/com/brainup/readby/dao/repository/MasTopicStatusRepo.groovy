@@ -14,4 +14,6 @@ interface MasTopicStatusRepo extends JpaRepository<MasTopicStatus,Long> {
     def MasTopicStatus findTopByTopicIdAndUseridOrderByTopicStatusIdDesc(long aLong1, long aLong2)
 
     def List<MasTopicStatus> findByUserid(long aLong)
+
+    def List<MasTopicStatus> findBySubjectIdAndUserid(long aLong1, long aLong2)
 }
