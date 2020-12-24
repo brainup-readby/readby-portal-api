@@ -2,17 +2,20 @@ package com.brainup.readby.service
 
 import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasBoardDP
+import com.brainup.readby.dao.entity.MasChapters
 import com.brainup.readby.dao.entity.MasCourseYear
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
+import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.MasYearLkp
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.dao.repository.MasBoardDPRepo
 import com.brainup.readby.dao.repository.MasBoardRepo
 import com.brainup.readby.dao.repository.MasChapterRepo
+import com.brainup.readby.dao.repository.MasChaptersDTORepo
 import com.brainup.readby.dao.repository.MasCourseYearRepo
 import com.brainup.readby.dao.repository.MasCoursesRepo
 import com.brainup.readby.dao.repository.MasCoursesTypeRepo
@@ -23,7 +26,9 @@ import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.MasYearLkpRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
+import com.brainup.readby.dto.MasChaptersDTO
 import com.brainup.readby.dto.MasCoursesDTO
+import com.brainup.readby.dto.MasSubjectsDTO
 import com.brainup.readby.dto.UserDetailsDTO
 import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -85,6 +90,9 @@ class AdminService {
     @Autowired
     MasYearLkpRepo masYearLkpRepo
 
+    @Autowired
+    MasChaptersDTORepo masChaptersDTORepo
+
 
     def Map<String, Long> getDashBoardDetail() {
         Map<String, Long> map = new LinkedHashMap<>()
@@ -112,11 +120,11 @@ class AdminService {
 
     def List<MasCourses> getCourseList() {
 
-        masCoursesRepo.findByIsActiveOrderByCourseIdDesc("t")
+        masCoursesRepo.findAll()
 
     }
 
-    def MasCourses addCourses(MultipartFile file,String masCourse) {
+    def MasCourses addCourses(MultipartFile file, String masCourse) {
         String fileurl = this.amazonClient.uploadFile(file)
         log.info "fileurl: ${fileurl}"
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
@@ -136,8 +144,8 @@ class AdminService {
     def MasCourses editCourses(MultipartFile file, String masCourse) {
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
         String fileurl = masCourses.iconPath
-        if(file!=null && file.size > 0)
-         fileurl = this.amazonClient.uploadFile(file)
+        if (file != null && file.size > 0)
+            fileurl = this.amazonClient.uploadFile(file)
         log.info "fileurl: ${fileurl}"
         masCourses.iconPath = fileurl
         return saveMasCourses(masCourses)
@@ -163,9 +171,11 @@ class AdminService {
     def String deleteCourse(long courseId) {
         try {
             log.info "Deleting course record for course id ${courseId}"
-            masCoursesRepo.deleteByCourseId(courseId)
+            MasCourses masCourses1 = masCoursesRepo.findByCourseId(courseId)
+            masCourses1.isActive = "f"
+            masCoursesRepo.save(masCourses1)
             "Successfully deleted record for course id ${courseId}"
-        }catch(Exception ex){
+        } catch (Exception ex) {
             log.error(ex)
             log.error "Exception occured while deleting course record for course id ${courseId}"
         }
@@ -180,9 +190,9 @@ class AdminService {
     }
 
     def List<UserTransactionDetails> getUserTransactionList() {
-        List<UserTransactionDetails> userTransactionDetailsList = userTransactionDetailsRepo.findAll(Sort.by(Sort.Direction.DESC,"userTransId"))
+        List<UserTransactionDetails> userTransactionDetailsList = userTransactionDetailsRepo.findAll(Sort.by(Sort.Direction.DESC, "userTransId"))
         List<UserTransactionDetails> utdli = new ArrayList<>()
-        for(UserTransactionDetails utd : userTransactionDetailsList){
+        for (UserTransactionDetails utd : userTransactionDetailsList) {
             MasCourses masCourses = masCoursesRepo.findByCourseId(utd.courseId)
             MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
             masCoursesDTO.courseId = masCourses.courseId
@@ -220,9 +230,111 @@ class AdminService {
     def String deleteBoard(long aLong) {
         try {
             log.info "Deleting board record for board id ${aLong}"
-            masBoardRepo.deleteByBoardId(aLong)
+            MasBoard masBoard = masBoardRepo.findByBoardId(aLong)
+            masBoard.isActive = "f"
+            masBoardRepo.save(masBoard)
             "Successfully deleted record for board id ${aLong}"
-        }catch(Exception ex){
+        } catch (Exception ex) {
+            log.error(ex)
+            log.error "Exception occured while deleting course record for course id ${aLong}"
+        }
+
+    }
+
+    def List<UserDetails> getUserList() {
+
+        userDetailsRepo.findAll()
+    }
+
+    def List<MasSubjectsDTO> getSubjectList() {
+
+        List<MasSubjects> masSubjectsList = masSubjectsRepo.findAll()
+        List<MasSubjectsDTO> li = new ArrayList<>()
+        for (MasSubjects masSubjects : masSubjectsList) {
+            MasSubjectsDTO masSubjectsDTO = new MasSubjectsDTO()
+            masSubjectsDTO.subjectId = masSubjects.subjectId
+            masSubjectsDTO.subjectName = masSubjects.subjectName
+            masSubjectsDTO.subjectCode = masSubjects.subjectCode
+            masSubjectsDTO.subjectPrice = masSubjects.subjectPrice
+            masSubjectsDTO.iconPath = masSubjects.iconPath
+            masSubjectsDTO.streamId = masSubjects.streamId
+            masSubjectsDTO.yearId = masSubjects.yearId
+            li.add(masSubjectsDTO)
+        }
+        li
+    }
+
+    def MasSubjects addSubjects(MultipartFile multipartFile, String masSubjects) {
+
+        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        log.info "fileurl: ${fileurl}"
+        MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
+        masSubjects1.iconPath = fileurl
+        return masSubjectsRepo.save(masSubjects1)
+    }
+
+    def MasSubjects editSubjects(MultipartFile file, String masSubjects) {
+
+        MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
+        String fileurl = masSubjects1.iconPath
+        if (file != null && file.size > 0)
+            fileurl = this.amazonClient.uploadFile(file)
+        log.info "fileurl: ${fileurl}"
+        masSubjects1.iconPath = fileurl
+        return masSubjectsRepo.save(masSubjects1)
+    }
+
+    def String deleteSubject(long aLong) {
+        try {
+            log.info "Deleting subject record for subject id ${aLong}"
+            MasSubjects masSubjects = masSubjectsRepo.findBySubjectId(aLong)
+            masSubjects.isActive = "f"
+            masSubjectsRepo.save(masSubjects)
+            "Successfully deleted record for subject id ${aLong}"
+        } catch (Exception ex) {
+            log.error(ex)
+            log.error "Exception occured while deleting course record for course id ${aLong}"
+        }
+    }
+
+    def List<MasChaptersDTO> getChapterList() {
+
+        masChaptersDTORepo.findAll()
+
+    }
+
+    def MasChaptersDTO addChapters(MultipartFile multipartFile, String masChapters) {
+
+        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        log.info "fileurl: ${fileurl}"
+        MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
+        masChapters1.iconPath = fileurl
+        masChapters1.createdBy = "readby-admin"
+        return masChaptersDTORepo.save(masChapters1)
+
+    }
+
+    def MasChaptersDTO editChapters(MultipartFile file, String masChapters) {
+        MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
+        String fileurl = masChapters1.iconPath
+        if (file != null && file.size > 0)
+            fileurl = this.amazonClient.uploadFile(file)
+        log.info "fileurl: ${fileurl}"
+        masChapters1.iconPath = fileurl
+        masChapters1.updatedBy = "readby-admin"
+        masChapters1.updatedAt = new Timestamp(new Date().getTime())
+        return masChaptersDTORepo.save(masChapters1)
+    }
+
+    def String deleteChapter(long aLong) {
+
+        try {
+            log.info "Deleting chapter record for chapter id ${aLong}"
+            MasChaptersDTO masChaptersDTO = masChaptersDTORepo.findByChapterId(aLong)
+            masChaptersDTO.isActive = "f"
+            masChaptersDTORepo.save(masChaptersDTO)
+            "Successfully deleted record for chapter id ${aLong}"
+        } catch (Exception ex) {
             log.error(ex)
             log.error "Exception occured while deleting course record for course id ${aLong}"
         }

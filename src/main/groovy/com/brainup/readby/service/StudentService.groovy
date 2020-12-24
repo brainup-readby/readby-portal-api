@@ -397,6 +397,8 @@ class StudentService {
 
     def UserLoginDetails getLoginDetail(Map<String, String> map) {
 
+        log.info "Device Token ::: ${map.get("token").toString()}"
+
         UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
         if (userLoginDetails == null) {
             UserDetails userDetails = userDetailsRepo.findTopByMobileNoOrderByUseridDesc(map.get("mobileNo").toLong())
@@ -405,15 +407,15 @@ class StudentService {
                     mobileNo: map.get("mobileNo").toLong(),
                     createdBy: "readby",
                     loginFlag: "t",
-                    token: map.get("token")
+                    token: map.get("token").toString()
             )
             userLoginDetailsRepo.save(uld)
            // true
-        } else if (!userLoginDetails.token.equalsIgnoreCase(map.get("token"))) {
+        } else if (!map.get("token").toString().equalsIgnoreCase(userLoginDetails.token)) {
             userLoginDetails.loginFlag = "t"
             userLoginDetails.updatedBy = "readby"
             userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
-            userLoginDetails.token = map.get("token")
+            userLoginDetails.token = map.get("token").toString()
             userLoginDetailsRepo.save(userLoginDetails)
             //true
         } else {

@@ -25,4 +25,16 @@ class MasSubjectsDTO implements Serializable{
     @Column(name = 'SUBJECT_PRICE')
     @JsonProperty(value = 'SUBJECT_PRICE')
     private Long subjectPrice
+
+    @JsonProperty(value = 'icon_path')
+    private String iconPath
+
+
+    @Column(name = 'STREAM_ID')
+    @JsonProperty(value = 'STREAM_ID')
+    private Long streamId
+
+    @Column(name = 'YEAR_ID')
+    @JsonProperty(value = 'YEAR_ID')
+    private Long yearId
 }

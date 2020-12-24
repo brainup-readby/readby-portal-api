@@ -22,6 +22,7 @@ class MasSubjects implements Serializable{
 
     @Id
     @Column(name = 'SUBJECT_ID')
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'SUBJECT_ID')
     private Long subjectId
 

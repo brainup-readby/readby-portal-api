@@ -3,13 +3,18 @@ package com.brainup.readby.controller
 import com.brainup.readby.config.ResponseObject
 import com.brainup.readby.dao.entity.MasBoard
 import com.brainup.readby.dao.entity.MasBoardDP
+import com.brainup.readby.dao.entity.MasChapters
 import com.brainup.readby.dao.entity.MasCourses
 import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
+import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.MasYearLkp
+import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserSubscriptions
 import com.brainup.readby.dao.entity.UserTransactionDetails
+import com.brainup.readby.dto.MasChaptersDTO
+import com.brainup.readby.dto.MasSubjectsDTO
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.AdminService
 import groovy.util.logging.Slf4j
@@ -216,6 +221,146 @@ class ReadByAdminController {
         try {
             log.info "calling deleteBoard service for admin."
             String msg = adminService.deleteBoard(map.get("boardId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getUserList")
+    ResponseEntity getUserList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getUserList service for admin."
+            List<UserDetails> userDetails = adminService.getUserList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = userDetails
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getSubjectList")
+    ResponseEntity getSubjectList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getSubjectList service for admin."
+            List<MasSubjectsDTO> masSubjectsList = adminService.getSubjectList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masSubjectsList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/addSubjects", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> addSubjects(@RequestParam("file") MultipartFile file, @RequestParam("masSubjects") String masSubjects) {
+        try {
+            log.info "calling addSubjects service for admin."
+            MasSubjects masSubjects1 = adminService.addSubjects(file, masSubjects)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Subjects added successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/editSubjects", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> editSubjects(@RequestParam("file") MultipartFile file, @RequestParam("masSubjects") String masSubjects) {
+        try {
+            log.info "calling editSubjects service for admin."
+            MasSubjects masSubjects1 = adminService.editSubjects(file, masSubjects)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Subjects edited successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @DeleteMapping(value = "/deleteSubject")
+    ResponseEntity deleteSubject(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteSubject service for admin where subjectId: ${map.get("subjectId")}."
+            String msg = adminService.deleteSubject(map.get("subjectId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getChapterList")
+    ResponseEntity getChapterList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getChapterList service for admin."
+            List<MasChaptersDTO> masChaptersList = adminService.getChapterList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masChaptersList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+
+    @PostMapping(value = "/addChapters", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> addChapters(@RequestParam("file") MultipartFile file, @RequestParam("masChapters") String masChapters) {
+        try {
+            log.info "calling addChapters service for admin."
+            MasChaptersDTO masChapters1 = adminService.addChapters(file, masChapters)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Chapters added successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/editChapters", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> editChapters(@RequestParam("file") MultipartFile file, @RequestParam("masChapters") String masChapters) {
+        try {
+            log.info "calling editChapters service for admin."
+            MasChaptersDTO masChapters1 = adminService.editChapters(file, masChapters)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Chapters edited successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @DeleteMapping(value = "/deleteChapter")
+    ResponseEntity deleteChapter(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteChapter service for admin where chapterId: ${map.get("chapterId")}."
+            String msg = adminService.deleteChapter(map.get("chapterId").toLong())
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = msg
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
