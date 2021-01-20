@@ -18,14 +18,14 @@ import javax.persistence.Table
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_year_lkp')
+@Table(name = 'mas_course_years')
 @Getter
 @Setter
 @ToString
 class MasYearLkp implements Serializable{
 
     @Id
-    @Column(name = 'YEAR_LKP_ID')
+    @Column(name = 'YEAR_ID')
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'YEAR_ID')
     private Long yearId
@@ -37,4 +37,12 @@ class MasYearLkp implements Serializable{
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
+
+    @Column(name = 'DISPLAY_NAME')
+    @JsonProperty(value = 'DISPLAY_NAME')
+    private String displayName
+
+    @Column(name = 'COURSE_ID')
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
 }

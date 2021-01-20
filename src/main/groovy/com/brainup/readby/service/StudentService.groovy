@@ -13,6 +13,8 @@ import com.brainup.readby.dao.entity.MasTopicStatus
 import com.brainup.readby.dao.entity.OtpInfo
 import com.brainup.readby.dao.entity.RbMultipleAnswers
 import com.brainup.readby.dao.entity.RbQuestionnaires
+import com.brainup.readby.dao.entity.RbRandomQuiz
+import com.brainup.readby.dao.entity.RbRandomQuizResult
 import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
@@ -33,6 +35,8 @@ import com.brainup.readby.dao.repository.MasTopicStatusRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
 import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
+import com.brainup.readby.dao.repository.RbRandomQuizRepo
+import com.brainup.readby.dao.repository.RbRandomQuizResultRepo
 import com.brainup.readby.dao.repository.RbStudentAnswersRepo
 import com.brainup.readby.dao.repository.RbStudentReportRepo
 import com.brainup.readby.dao.repository.RbStudentStudyStateRepo
@@ -103,6 +107,12 @@ class StudentService {
 
     @Autowired
     MasRoleRepo masRoleRepo
+
+    @Autowired
+    RbRandomQuizRepo rbRandomQuizRepo
+
+    @Autowired
+    RbRandomQuizResultRepo rbRandomQuizResultRepo
 
     @Autowired
     RbStudentStudyStateRepo rbStudentStudyStateRepo
@@ -251,7 +261,7 @@ class StudentService {
                 }
                 us.rbStudentStudyState = rbStudentStudyStateDTO
                 MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
-                List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamId(us.streamId)
+                List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamIdAndYearId(us.streamId,us.yearId)
                 for (MasSubjects masSubjects : masSubjectsList) {
                     List<MasChapters> masChaptersList = masSubjects.masChapters
                     for (MasChapters masChapters : masChaptersList) {
@@ -411,28 +421,40 @@ class StudentService {
             )
             userLoginDetailsRepo.save(uld)
            // true
-        } else if (!map.get("token").toString().equalsIgnoreCase(userLoginDetails.token)) {
+        } /*else if (!map.get("token").toString().equalsIgnoreCase(userLoginDetails.token)) {
             userLoginDetails.loginFlag = "t"
             userLoginDetails.updatedBy = "readby"
             userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
             userLoginDetails.token = map.get("token").toString()
             userLoginDetailsRepo.save(userLoginDetails)
             //true
-        } else {
+        }*/ else {
             userLoginDetails
         }
     }
 
     def UserLoginDetails getLogoutDetail(Map<String, String> map) {
         UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
-        userLoginDetails.loginFlag = "f"
+       /* userLoginDetails.loginFlag = "f"
         userLoginDetails.updatedBy = "readby"
-        userLoginDetails.updatedAt = new Timestamp(new Date().getTime())
-        return userLoginDetailsRepo.save(userLoginDetails)
+        userLoginDetails.token = null
+        userLoginDetails.updatedAt = new Timestamp(new Date().getTime())*/
+        return userLoginDetailsRepo.delete(userLoginDetails)
 
     }
 
     def ReadbyFeedback saveFeedBack(ReadbyFeedback readbyFeedback) {
         readbyFeedbackRepo.save(readbyFeedback)
+    }
+
+    def List<RbRandomQuiz> getRandomQuiz(Map<String, String> map) {
+        rbRandomQuizRepo.findBySubjectId(map.get("subjectId").toLong())
+
+    }
+
+    def RbRandomQuizResult saveRandonQuizResult(RbRandomQuizResult rbRandomQuizResult) {
+
+        rbRandomQuizResultRepo.save(rbRandomQuizResult)
+
     }
 }

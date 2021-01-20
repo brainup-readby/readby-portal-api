@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository
 interface MasCourseYearRepo extends JpaRepository<MasCourseYear,Long> {
 
     MasCourseYear findByYearId(long aLong)
+
+    def List<MasCourseYear> findByIsActiveIgnoreCase(String s)
+
 }

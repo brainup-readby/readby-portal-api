@@ -90,5 +90,16 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = "SUBJECT_PROGRESS")
     private Double percentage
 
+    @Transient
+    @JsonProperty(value = "MAS_STREAM")
+    MasStream masStream
+
+    @Transient
+    @JsonProperty(value = 'MAS_COURSE_YEAR')
+    private MasCourseYear masCourseYear
+
+    @Transient
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
 
 }

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 interface MasChaptersDTORepo extends JpaRepository<MasChaptersDTO,Long> {
 
     def MasChaptersDTO findByChapterId(long l)
+
+    List<MasChaptersDTO> findBySubjectId(long aLong)
 }

@@ -5,6 +5,7 @@ import lombok.Getter
 import lombok.Setter
 
 import javax.persistence.Column
+import javax.persistence.Transient
 
 @Getter
 @Setter
@@ -37,4 +38,28 @@ class MasSubjectsDTO implements Serializable{
     @Column(name = 'YEAR_ID')
     @JsonProperty(value = 'YEAR_ID')
     private Long yearId
+
+    @Column(name = 'IS_ACTIVE')
+    @JsonProperty(value = 'IS_ACTIVE')
+    private String isActive
+
+    @Transient
+    @JsonProperty(value = 'STREAM_CODE')
+    private String streamCode
+
+    @Transient
+    @JsonProperty(value = 'STREAM_NAME')
+    private String streamName
+
+    @Transient
+    @JsonProperty(value = 'YEAR')
+    private Long year
+
+    @Transient
+    @JsonProperty(value = 'YEAR_DISPLAY_NAME')
+    private String yearDisplayName
+
+    @Column(name = 'COURSE_ID')
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
 }

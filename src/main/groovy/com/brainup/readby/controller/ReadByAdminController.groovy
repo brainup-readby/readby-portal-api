@@ -1,22 +1,13 @@
 package com.brainup.readby.controller
 
 import com.brainup.readby.config.ResponseObject
-import com.brainup.readby.dao.entity.MasBoard
-import com.brainup.readby.dao.entity.MasBoardDP
-import com.brainup.readby.dao.entity.MasChapters
-import com.brainup.readby.dao.entity.MasCourses
-import com.brainup.readby.dao.entity.MasCoursesType
-import com.brainup.readby.dao.entity.MasStream
-import com.brainup.readby.dao.entity.MasStreamLkp
-import com.brainup.readby.dao.entity.MasSubjects
-import com.brainup.readby.dao.entity.MasYearLkp
-import com.brainup.readby.dao.entity.UserDetails
-import com.brainup.readby.dao.entity.UserSubscriptions
-import com.brainup.readby.dao.entity.UserTransactionDetails
+import com.brainup.readby.dao.entity.*
 import com.brainup.readby.dto.MasChaptersDTO
 import com.brainup.readby.dto.MasSubjectsDTO
+import com.brainup.readby.dto.MasTopicDTO
 import com.brainup.readby.exception.BadRequestException
 import com.brainup.readby.service.AdminService
+import com.brainup.readby.service.StudentService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -32,6 +23,9 @@ class ReadByAdminController {
 
     @Autowired
     AdminService adminService
+
+    @Autowired
+    StudentService studentService
 
     @GetMapping(value = "/getDashBoardDetail")
     ResponseEntity getDashBoardDetail(@RequestParam Map<String, String> map) {
@@ -145,7 +139,7 @@ class ReadByAdminController {
     ResponseEntity getMasStreamList(@RequestParam Map<String, String> map) {
         try {
             log.info "calling getMasStreamList service for admin."
-            List<MasStreamLkp> masStreamList = adminService.getMasStreamList()
+            List<MasStreamLkp> masStreamList = adminService.getMasStreamList(map.get("courseId").toLong())
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = masStreamList
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
@@ -160,7 +154,7 @@ class ReadByAdminController {
     ResponseEntity getMasYearList(@RequestParam Map<String, String> map) {
         try {
             log.info "calling getMasStreamList service for admin."
-            List<MasYearLkp> masYearLkpList = adminService.getMasYearList()
+            List<MasYearLkp> masYearLkpList = adminService.getMasYearList(map.get("courseId").toLong())
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = masYearLkpList
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
@@ -371,4 +365,156 @@ class ReadByAdminController {
         }
     }
 
+    @GetMapping(value = "/getTopicList")
+    ResponseEntity getTopicList(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getTopicList service for admin."
+            List<MasTopicDTO> masTopicList = adminService.getTopicList()
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masTopicList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+
+    @PostMapping(value = "/addTopics", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> addTopics(@RequestParam("file") MultipartFile file, @RequestParam("masTopics") String masTopics) {
+        try {
+            log.info "calling addTopics service for admin."
+            MasTopicDTO masTopic = adminService.addTopics(file, masTopics)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Topic added successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/editTopics", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> editTopics(@RequestParam("file") MultipartFile file, @RequestParam("masTopics") String masTopics) {
+        try {
+            log.info "calling editTopics service for admin."
+            MasTopicDTO masTopic = adminService.editTopics(file, masTopics)
+            // ResponseObject responseObject = new ResponseObject()
+            // responseObject.data = "Uploaded"
+            //ResponseEntity.status(HttpStatus.OK).body(responseObject)
+            return new ResponseEntity<Object>("Topic edited successfully", HttpStatus.CREATED)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @DeleteMapping(value = "/deleteTopic")
+    ResponseEntity deleteTopic(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteTopic service for admin where topicId: ${map.get("topicId")}."
+            String msg = adminService.deleteTopic(map.get("topicId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getChaptersBySubject")
+    ResponseEntity getChaptersBySubject(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getTopicList service for admin."
+            List<MasChaptersDTO> masChaptersDTOList = adminService.getChaptersBySubject(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masChaptersDTOList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getTopicsByChapter")
+    ResponseEntity getTopicsByChapter(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getTopicList service for admin."
+            List<MasTopicDTO> masTopicDTOList = adminService.getTopicsByChapter(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masTopicDTOList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getSubjectByStreamOrYear")
+    ResponseEntity getSubjectByStreamOrYear(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getTopicList service for admin."
+            List<MasSubjectsDTO> masTopicDTOList = adminService.getSubjectByStreamOrYear(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masTopicDTOList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/addStream")
+    ResponseEntity addStream(@RequestBody MasStreamLkp masStreamLkp) {
+        try {
+
+            MasStreamLkp masStreamLkp1 = adminService.addStream(masStreamLkp)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masStreamLkp1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/addYear")
+    ResponseEntity addYear(@RequestBody MasYearLkp masYearLkp) {
+        try {
+
+            MasYearLkp masYearLkp1 = adminService.addYear(masYearLkp)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masYearLkp1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getLogoutDetail")
+    ResponseEntity getLogoutDetail(@RequestParam Map<String, String> map) {
+        try {
+            UserLoginDetails userLoginDetails = studentService.getLogoutDetail(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = userLoginDetails
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
 }
+
+

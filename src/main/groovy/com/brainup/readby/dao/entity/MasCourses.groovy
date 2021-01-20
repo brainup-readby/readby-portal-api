@@ -74,6 +74,10 @@ class MasCourses implements Serializable{
     @JsonProperty(value = 'COURSE_PRICE')
     private Long coursePrice
 
+    @Transient
+    @JsonProperty(value = 'BOARD_NAME')
+    private String boardName
+
     /*@OneToMany(mappedBy = "masCourses", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty(value = 'MAS_SUBJECTS')
     private List<MasSubjects> masSubjects*/

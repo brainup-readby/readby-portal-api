@@ -8,6 +8,8 @@ import com.brainup.readby.dao.entity.MasRole
 import com.brainup.readby.dao.entity.MasTopic
 import com.brainup.readby.dao.entity.MasTopicStatus
 import com.brainup.readby.dao.entity.RbQuestionnaires
+import com.brainup.readby.dao.entity.RbRandomQuiz
+import com.brainup.readby.dao.entity.RbRandomQuizResult
 import com.brainup.readby.dao.entity.RbStudentAnswers
 import com.brainup.readby.dao.entity.RbStudentReport
 import com.brainup.readby.dao.entity.RbStudentStudyState
@@ -340,6 +342,32 @@ class ReadByRestController {
             ReadbyFeedback readbyFeedbackDB = studentService.saveFeedBack(readbyFeedback)
             ResponseObject responseObject = new ResponseObject()
             responseObject.data = readbyFeedbackDB
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        }catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @GetMapping(value = "/getRandomQuiz")
+    ResponseEntity getRandomQuiz(@RequestParam Map<String, String> map) {
+        try {
+            List<RbRandomQuiz> rbRandomQuiz = studentService.getRandomQuiz(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbRandomQuiz
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/saveRandonQuizResult")
+    ResponseEntity saveRandonQuizResult(@RequestBody RbRandomQuizResult rbRandomQuizResult) {
+        try {
+            RbRandomQuizResult result = studentService.saveRandonQuizResult(rbRandomQuizResult)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = result
             ResponseEntity.status(HttpStatus.OK).body(responseObject)
         }catch (Exception e) {
             log.error " ${e.message}"

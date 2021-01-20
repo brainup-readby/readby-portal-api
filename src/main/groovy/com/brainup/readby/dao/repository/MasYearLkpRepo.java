@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface MasYearLkpRepo extends JpaRepository<MasYearLkp,Long> {
     List<MasYearLkp> findByIsActiveIgnoreCase(String isActive);
+
+    List<MasYearLkp> findByIsActiveIgnoreCaseAndCourseId(String s, Long aLong);
 }

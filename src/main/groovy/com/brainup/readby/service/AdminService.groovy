@@ -9,6 +9,7 @@ import com.brainup.readby.dao.entity.MasCoursesType
 import com.brainup.readby.dao.entity.MasStream
 import com.brainup.readby.dao.entity.MasStreamLkp
 import com.brainup.readby.dao.entity.MasSubjects
+import com.brainup.readby.dao.entity.MasTopic
 import com.brainup.readby.dao.entity.MasYearLkp
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserTransactionDetails
@@ -22,6 +23,7 @@ import com.brainup.readby.dao.repository.MasCoursesTypeRepo
 import com.brainup.readby.dao.repository.MasStreamLkpRepo
 import com.brainup.readby.dao.repository.MasStreamRepo
 import com.brainup.readby.dao.repository.MasSubjectsRepo
+import com.brainup.readby.dao.repository.MasTopicDTORepo
 import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.MasYearLkpRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
@@ -29,6 +31,7 @@ import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasChaptersDTO
 import com.brainup.readby.dto.MasCoursesDTO
 import com.brainup.readby.dto.MasSubjectsDTO
+import com.brainup.readby.dto.MasTopicDTO
 import com.brainup.readby.dto.UserDetailsDTO
 import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 import java.sql.Timestamp
+import java.util.stream.Collectors
 
 @Service
 @Slf4j
@@ -59,6 +63,9 @@ class AdminService {
 
     @Autowired
     MasCoursesRepo masCoursesRepo
+
+    @Autowired
+    MasTopicDTORepo masTopicDTORepo
 
     @Autowired
     MasSubjectsRepo masSubjectsRepo
@@ -120,8 +127,17 @@ class AdminService {
 
     def List<MasCourses> getCourseList() {
 
-        masCoursesRepo.findAll()
+        List<MasCourses> masCoursesList = masCoursesRepo.findAll()
+        List<MasCourses> li = new ArrayList<MasCourses>()
 
+        for(MasCourses masCourses : masCoursesList){
+            if(masCourses.boardId != null) {
+                MasBoardDP masBoardDP = masBoardDPRepo.findByBoardId(masCourses.boardId)
+                masCourses.boardName = masBoardDP.boardName
+            }
+            li.add(masCourses)
+        }
+        li
     }
 
     def MasCourses addCourses(MultipartFile file, String masCourse) {
@@ -181,12 +197,12 @@ class AdminService {
         }
     }
 
-    def List<MasStreamLkp> getMasStreamList() {
-        masStreamLkpRepo.findByIsActiveIgnoreCase("t")
+    def List<MasStreamLkp> getMasStreamList(Long courseId) {
+        masStreamLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t",courseId)
     }
 
-    def List<MasYearLkp> getMasYearList() {
-        masYearLkpRepo.findByIsActiveIgnoreCase("t")
+    def List<MasYearLkp> getMasYearList(Long courseId) {
+        masYearLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t",courseId)
     }
 
     def List<UserTransactionDetails> getUserTransactionList() {
@@ -236,7 +252,7 @@ class AdminService {
             "Successfully deleted record for board id ${aLong}"
         } catch (Exception ex) {
             log.error(ex)
-            log.error "Exception occured while deleting course record for course id ${aLong}"
+            log.error "Exception occured while deleting board record for board id ${aLong}"
         }
 
     }
@@ -258,7 +274,18 @@ class AdminService {
             masSubjectsDTO.subjectPrice = masSubjects.subjectPrice
             masSubjectsDTO.iconPath = masSubjects.iconPath
             masSubjectsDTO.streamId = masSubjects.streamId
+            MasStream masStream = masStreamRepo.findByStreamId(masSubjects.streamId)
+
+            if(masStream.masCourses != null && masStream.masCourses.courseId !=null)
+            masSubjectsDTO.courseId = masStream.masCourses.courseId
+
+            masSubjectsDTO.streamName = masStream.streamName
+            masSubjectsDTO.streamCode = masStream.streamCode
             masSubjectsDTO.yearId = masSubjects.yearId
+            MasCourseYear masCourseYear = masCourseYearRepo.findByYearId(masSubjects.yearId)
+            masSubjectsDTO.year = masCourseYear.year
+            masSubjectsDTO.yearDisplayName = masCourseYear.displayName
+            masSubjectsDTO.isActive = masSubjects.isActive
             li.add(masSubjectsDTO)
         }
         li
@@ -270,6 +297,19 @@ class AdminService {
         log.info "fileurl: ${fileurl}"
         MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
         masSubjects1.iconPath = fileurl
+        masSubjects1.createdBy = "Admin"
+       /* MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
+
+        MasStream ms = masSubjects1.masStream
+        ms.masCourses = masCoursesDB
+        MasStream masStream = masStreamRepo.save(ms)
+        masSubjects1.streamId = masStream.streamId
+
+        MasCourseYear my = masSubjects1.masCourseYear
+         my.masCourses = masCoursesDB
+        MasCourseYear masCourseYear = masCourseYearRepo.save(my)
+        masSubjects1.yearId = masCourseYear.yearId8*/
+
         return masSubjectsRepo.save(masSubjects1)
     }
 
@@ -281,6 +321,19 @@ class AdminService {
             fileurl = this.amazonClient.uploadFile(file)
         log.info "fileurl: ${fileurl}"
         masSubjects1.iconPath = fileurl
+        masSubjects1.updatedBy = "Admin"
+      /*  MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
+
+        MasStream ms = masSubjects1.masStream
+        ms.masCourses = masCoursesDB
+        MasStream masStream = masStreamRepo.save(ms)
+        masSubjects1.streamId = masStream.streamId
+
+        MasCourseYear my = masSubjects1.masCourseYear
+        my.masCourses = masCoursesDB
+        MasCourseYear masCourseYear = masCourseYearRepo.save(my)
+        masSubjects1.yearId = masCourseYear.yearId*/
+
         return masSubjectsRepo.save(masSubjects1)
     }
 
@@ -293,7 +346,7 @@ class AdminService {
             "Successfully deleted record for subject id ${aLong}"
         } catch (Exception ex) {
             log.error(ex)
-            log.error "Exception occured while deleting course record for course id ${aLong}"
+            log.error "Exception occured while deleting subject record for subject id ${aLong}"
         }
     }
 
@@ -336,8 +389,97 @@ class AdminService {
             "Successfully deleted record for chapter id ${aLong}"
         } catch (Exception ex) {
             log.error(ex)
-            log.error "Exception occured while deleting course record for course id ${aLong}"
+            log.error "Exception occured while deleting chapter record for chapter id ${aLong}"
         }
 
+    }
+
+    def List<MasTopicDTO> getTopicList() {
+        masTopicDTORepo.findAll()
+    }
+
+    def MasTopicDTO addTopics(MultipartFile multipartFile, String masTopics) {
+
+        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        log.info "fileurl: ${fileurl}"
+        MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
+        masTopic.iconPath = fileurl
+        masTopic.createdBy = "readby-admin"
+        return masTopicDTORepo.save(masTopic)
+    }
+
+    def MasTopicDTO editTopics(MultipartFile file, String masTopics) {
+        MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
+        String fileurl = masTopic.iconPath
+        if (file != null && file.size > 0)
+            fileurl = this.amazonClient.uploadFile(file)
+        log.info "fileurl: ${fileurl}"
+        masTopic.iconPath = fileurl
+        masTopic.updatedBy = "readby-admin"
+        masTopic.updatedAt = new Timestamp(new Date().getTime())
+        return masTopicDTORepo.save(masTopic)
+    }
+
+    def String deleteTopic(long aLong) {
+        try {
+            log.info "Deleting topic record for topic id ${aLong}"
+            MasTopicDTO masTopic = masTopicDTORepo.findByTopicId(aLong)
+            masTopic.isActive = "f"
+            masTopicDTORepo.save(masTopic)
+            "Successfully deleted record for topic id ${aLong}"
+        } catch (Exception ex) {
+            log.error(ex)
+            log.error "Exception occured while deleting course record for topic id ${aLong}"
+        }
+
+    }
+
+    def List<MasChaptersDTO> getChaptersBySubject(Map<String, String> map) {
+        masChaptersDTORepo.findBySubjectId(map.get("subjectId").toLong())
+    }
+
+    def List<MasTopicDTO> getTopicsByChapter(Map<String, String> map) {
+        masTopicDTORepo.findByChapterId(map.get("chapterId").toLong())
+    }
+
+    def List<MasSubjectsDTO> getSubjectByStreamOrYear(Map<String, String> map) {
+        List<MasSubjects> masSubjectsList
+        if(map.get("streamId") != null){
+            masSubjectsList = masSubjectsRepo.findByStreamId(map.get("streamId").toLong())
+        }else{
+            masSubjectsList = masSubjectsRepo.findByYearId(map.get("yearId").toLong())
+        }
+        List<MasSubjectsDTO> li = new ArrayList<>()
+        for (MasSubjects masSubjects : masSubjectsList) {
+            MasSubjectsDTO masSubjectsDTO = new MasSubjectsDTO()
+            masSubjectsDTO.subjectId = masSubjects.subjectId
+            masSubjectsDTO.subjectName = masSubjects.subjectName
+            masSubjectsDTO.subjectCode = masSubjects.subjectCode
+            masSubjectsDTO.subjectPrice = masSubjects.subjectPrice
+            masSubjectsDTO.iconPath = masSubjects.iconPath
+            masSubjectsDTO.streamId = masSubjects.streamId
+            MasStream masStream = masStreamRepo.findByStreamId(masSubjects.streamId)
+
+            if(masStream.masCourses != null && masStream.masCourses.courseId !=null)
+            masSubjectsDTO.courseId = masStream.masCourses.courseId
+            
+            masSubjectsDTO.streamName = masStream.streamName
+            masSubjectsDTO.streamCode = masStream.streamCode
+            masSubjectsDTO.yearId = masSubjects.yearId
+            MasCourseYear masCourseYear = masCourseYearRepo.findByYearId(masSubjects.yearId)
+            masSubjectsDTO.year = masCourseYear.year
+            masSubjectsDTO.yearDisplayName = masCourseYear.displayName
+            masSubjectsDTO.isActive = masSubjects.isActive
+            li.add(masSubjectsDTO)
+        }
+        li
+    }
+
+    def MasStreamLkp addStream(MasStreamLkp masStreamLkp) {
+        masStreamLkpRepo.save(masStreamLkp)
+    }
+
+    def MasYearLkp addYear(MasYearLkp masYearLkp) {
+        masYearLkpRepo.save(masYearLkp)
     }
 }

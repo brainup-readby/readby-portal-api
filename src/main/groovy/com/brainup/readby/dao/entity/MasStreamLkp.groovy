@@ -17,27 +17,31 @@ import javax.persistence.Table
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'mas_stream_lkp')
+@Table(name = 'mas_stream')
 @Getter
 @Setter
 @ToString
 class MasStreamLkp implements Serializable{
 
     @Id
-    @Column(name = 'STREAM_LKP_ID')
+    @Column(name = 'STREAM_ID')
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty(value = 'STREAM_ID')
     private Long streamId
 
-    @Column(name = 'STREAM_LKP_CODE')
+    @Column(name = 'STREAM_CODE')
     @JsonProperty(value = 'STREAM_CODE')
     private String streamCode
 
-    @Column(name = 'STREAM_LKP_NAME')
+    @Column(name = 'STREAM_NAME')
     @JsonProperty(value = 'STREAM_NAME')
     private String streamName
 
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
+
+    @Column(name = 'COURSE_ID')
+    @JsonProperty(value = 'COURSE_ID')
+    private Long courseId
 }

@@ -1,12 +1,10 @@
 package com.brainup.readby.dao.repository
 
-
-import com.brainup.readby.dao.entity.MasBoardDP
+import com.brainup.readby.dao.entity.RbRandomQuizResult
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MasBoardDPRepo extends JpaRepository<MasBoardDP,Long> {
+interface RbRandomQuizResultRepo extends JpaRepository<RbRandomQuizResult,Long> {
 
-    def MasBoardDP findByBoardId(long aLong)
 }

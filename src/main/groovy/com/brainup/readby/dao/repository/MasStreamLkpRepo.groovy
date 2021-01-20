@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
 interface MasStreamLkpRepo extends JpaRepository<MasStreamLkp,Long> {
 
     def List<MasStreamLkp> findByIsActiveIgnoreCase(String s)
+
+    List<MasStreamLkp> findByIsActiveIgnoreCaseAndCourseId(String s, long aLong)
 }

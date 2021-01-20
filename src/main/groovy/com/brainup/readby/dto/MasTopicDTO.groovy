@@ -1,5 +1,6 @@
-package com.brainup.readby.dao.entity
+package com.brainup.readby.dto
 
+import com.brainup.readby.dao.entity.MasChapters
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.Canonical
@@ -18,9 +19,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
 import javax.persistence.Table
-import javax.persistence.Transient
 import java.sql.Timestamp
 
 @Canonical
@@ -30,7 +29,7 @@ import java.sql.Timestamp
 @Getter
 @Setter
 @ToString
-class MasTopic implements Serializable{
+class MasTopicDTO implements Serializable{
 
     @Id
     @Column(name = 'TOPIC_ID')
@@ -82,27 +81,12 @@ class MasTopic implements Serializable{
     @JsonProperty(value = 'BOOK_URL')
     private String booKUrl
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "CHAPTER_ID"), name = "CHAPTER_ID",insertable = false,updatable = false)
-    private MasChapters masChapters
+    @Column(name = 'CHAPTER_ID')
+    @JsonProperty(value = 'CHAPTER_ID')
+    private Long chapterId
 
     @Column(name = 'TOPIC_SUBSCRIPTION')
     @JsonProperty(value = 'TOPIC_SUBSCRIPTION')
     private String topicSubscription
 
-    /*@Column(name = 'VIDEO_STATUS')
-    @JsonProperty(value = 'VIDEO_STATUS')
-    private String videoStatus
-
-    @Column(name = 'TEST_STATUS')
-    @JsonProperty(value = 'TEST_STATUS')
-    private String testStatus*/
-
-    /*@OneToOne (mappedBy="masTopic")
-    @JsonProperty(value = 'MAS_TOPIC_STATUS')
-    private MasTopicStatus masTopicStatus*/
-
-    @Transient
-    @JsonProperty(value = 'MAS_TOPIC_STATUS')
-    private MasTopicStatus masTopicStatus
 }
