@@ -17,4 +17,5 @@ interface MasBoardRepo extends JpaRepository<MasBoard,Long>{
     @Transactional
     def void deleteByBoardId(long l)
 
+    MasBoard findByBoardIdAndIsActive(long aLong, String s)
 }

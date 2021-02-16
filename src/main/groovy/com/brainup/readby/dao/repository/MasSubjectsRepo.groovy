@@ -14,4 +14,6 @@ interface MasSubjectsRepo extends JpaRepository<MasSubjects,Long>  {
     def List<MasSubjects> findByYearId(long aLong)
 
     List<MasSubjects> findByStreamIdAndYearId(long aLong1, long aLong2)
+
+    def List<MasSubjects> findByStreamIdAndYearIdAndIsActive(long aLong1, long aLong2, String isActive)
 }

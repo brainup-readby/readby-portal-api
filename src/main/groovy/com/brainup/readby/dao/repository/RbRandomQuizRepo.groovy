@@ -9,4 +9,8 @@ import org.springframework.stereotype.Repository
 interface RbRandomQuizRepo extends JpaRepository<RbRandomQuiz,Long> {
 
     def List<RbRandomQuiz> findBySubjectId(long aLong)
+
+    def RbRandomQuiz findByQuestionId(long aLong)
+
+    def List<RbRandomQuiz> findBySubjectIdAndImageFlag(long aLong, String imageFlag)
 }

@@ -33,7 +33,7 @@ class RbQuestions implements Serializable{
     private String questionDesc
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "QUESTIONNAIR_ID"), name = "QUESTIONNAIR_ID",insertable = false,updatable = false)
+    @JoinColumn(foreignKey = @ForeignKey(name = "QUESTIONNAIR_ID"), name = "QUESTIONNAIR_ID")
     private RbQuestionnaires rbQuestionnaires
 
     @Column(name = 'IS_ACTIVE')
@@ -84,5 +84,9 @@ class RbQuestions implements Serializable{
     @JoinColumn(name="QTYPE_ID")
     @JsonProperty(value = 'RB_QUESTION_TYPE')
     private RbQuestionType rbQuestionType
+
+    @OneToMany(mappedBy = "rbQuestions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonProperty(value = 'RB_MULTIPLE_ANSWER')
+    private List<RbMultipleAnswersDTO> rbMultipleAnswers
 
 }

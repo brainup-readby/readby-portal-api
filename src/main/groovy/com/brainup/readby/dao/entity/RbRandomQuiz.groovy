@@ -54,4 +54,12 @@ class RbRandomQuiz implements Serializable{
     @JsonProperty(value = 'CRRCT_OPTN')
     private String crrctOptn
 
+    @Column(name = 'QUESTIONID')
+    @JsonProperty(value = 'QUESTIONID')
+    private Long questionId
+
+    @Column(name = 'IMAGE_FLAG')
+    @JsonProperty(value = 'IMAGE_FLAG')
+    private String imageFlag
+
 }

@@ -11,4 +11,5 @@ interface MasStreamRepo extends JpaRepository<MasStream,Long> {
 
     def List<MasStream> findByIsActiveIgnoreCase(String isActive)
 
+    def MasStream findByStreamIdAndIsActive(long aLong, String isActive)
 }

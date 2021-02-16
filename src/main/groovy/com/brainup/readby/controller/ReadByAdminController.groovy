@@ -515,6 +515,63 @@ class ReadByAdminController {
             throw new BadRequestException(e.message)
         }
     }
+
+    @PostMapping(value = "/saveQuestionAnswer")
+    ResponseEntity saveQuestionAnswer(@RequestBody RbQuestionnaires rbQuestionnaires) {
+        try {
+
+            String rbQuestionnaires1 = adminService.addRbQuestionnaires(rbQuestionnaires)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbQuestionnaires1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(ex.message)
+        }
+    }
+
+    @PostMapping(value = "/uploadQuestImage", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
+    ResponseEntity<Object> uploadQuestImage(@RequestParam("file") MultipartFile file, @RequestParam("rbQuestion") String rbQuestion) {
+        try {
+            log.info "calling addTopics service for admin."
+            String rbQuestionnaires1 = adminService.uploadQuestImage(file, rbQuestion)
+            return new ResponseEntity<Object>("Image added successfully", HttpStatus.CREATED)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(ex.message)
+        }
+    }
+
+
+    @GetMapping(value = "/getQuestionList")
+    ResponseEntity getQuestionList(@RequestParam Map<String, String> map) {
+        try {
+            List<RbQuestionnaires> rbQuestionnaires = adminService.getQuestionList(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbQuestionnaires
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @PostMapping(value = "/editQuestionAnswer")
+    ResponseEntity editQuestionAnswer(@RequestBody RbQuestionnaires rbQuestionnaires) {
+        try {
+
+            String rbQuestionnaires1 = adminService.editQuestionAnswer(rbQuestionnaires)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = rbQuestionnaires1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(ex.message)
+        }
+    }
 }
 
 

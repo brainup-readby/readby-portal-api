@@ -28,9 +28,9 @@ class RbMultipleAnswers implements Serializable{
     @JsonProperty(value = 'QUESTION_ID')
     private Long questionId
 
-    @Column(name = 'CORRECT_OPTION_ID')
-    @JsonProperty(value = 'CORRECT_OPTION_ID')
-    private Long correctOptionId
+    @Column(name = 'CORRECT_OPTION')
+    @JsonProperty(value = 'CORRECT_OPTION')
+    private String correctOption
 
     @Column(name = 'marks')
     @JsonProperty(value = 'Marks')

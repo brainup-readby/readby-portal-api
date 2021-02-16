@@ -11,4 +11,5 @@ interface MasCourseYearRepo extends JpaRepository<MasCourseYear,Long> {
 
     def List<MasCourseYear> findByIsActiveIgnoreCase(String s)
 
+    def MasCourseYear findByYearIdAndIsActive(long aLong, String s)
 }

@@ -12,6 +12,7 @@ import com.brainup.readby.dao.entity.MasTopic
 import com.brainup.readby.dao.entity.MasTopicStatus
 import com.brainup.readby.dao.entity.OtpInfo
 import com.brainup.readby.dao.entity.RbMultipleAnswers
+import com.brainup.readby.dao.entity.RbMultipleOptions
 import com.brainup.readby.dao.entity.RbQuestionnaires
 import com.brainup.readby.dao.entity.RbRandomQuiz
 import com.brainup.readby.dao.entity.RbRandomQuizResult
@@ -34,6 +35,7 @@ import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.MasTopicStatusRepo
 import com.brainup.readby.dao.repository.OtpInfoRepo
 import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
+import com.brainup.readby.dao.repository.RbMultipleOptionsRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
 import com.brainup.readby.dao.repository.RbRandomQuizRepo
 import com.brainup.readby.dao.repository.RbRandomQuizResultRepo
@@ -57,7 +59,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
+import java.security.SecureRandom
 import java.sql.Timestamp
+import java.util.stream.Collectors
 
 @Service
 @Slf4j
@@ -114,6 +118,10 @@ class StudentService {
     @Autowired
     RbRandomQuizResultRepo rbRandomQuizResultRepo
 
+
+    @Autowired
+    RbMultipleOptionsRepo rbMultipleOptionsRepo
+
     @Autowired
     RbStudentStudyStateRepo rbStudentStudyStateRepo
 
@@ -149,6 +157,9 @@ class StudentService {
 
     @Value('${readby.mkey}')
     private String mkey
+
+    @Value('${question.numberOfQuestions}')
+    private String numberOfQuestions
 
     List<MasGlobalConfig> findByIsActive(String isActive) {
         List<MasGlobalConfig> masGlobalConfig = masGlobalConfigRepo.findByIsActiveIgnoreCase(isActive)
@@ -249,68 +260,90 @@ class StudentService {
             List<UserSubscriptions> userSubscriptionsli = new ArrayList<>()
             log.info "Number of user subscription ${userSubscriptions.size()}"
             for (UserSubscriptions us : userSubscriptions) {
-                RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
-                RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
-                if (rbStudentStudyStateDao != null) {
-                    System.out.println("Student study state id: " + rbStudentStudyStateDao.stateId)
-                    rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
-                    System.out.println(rbStudentStudyStateDTO.stateId)
-                    rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
-                    rbStudentStudyStateDTO.topicId = rbStudentStudyStateDao.topicId
-                    rbStudentStudyStateDTO.videoLeftTime = rbStudentStudyStateDao.videoLeftTime
-                }
-                us.rbStudentStudyState = rbStudentStudyStateDTO
-                MasStream masStreamDao = masStreamRepo.findByStreamId(us.streamId)
-                List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamIdAndYearId(us.streamId,us.yearId)
-                for (MasSubjects masSubjects : masSubjectsList) {
-                    List<MasChapters> masChaptersList = masSubjects.masChapters
-                    for (MasChapters masChapters : masChaptersList) {
-                        List<MasTopic> masTopicList = masChapters.mastopic
-                        int totalCount =  masTopicList.size()
-                        List<MasTopicStatus> masTopicStatusList = masTopicStatusRepo.findBySubjectIdAndUserid(masSubjects.subjectId,us.userid)
-                        int progressCount = masTopicStatusList.size()
-                        if(totalCount != 0) {
-                            double percentage = progressCount / totalCount
-                            percentage = percentage*100
-                            masSubjects.percentage = percentage
+                if (us != null && us.isActive != null && us.isActive.equalsIgnoreCase("t")) {
+                    RbStudentStudyState rbStudentStudyStateDao = rbStudentStudyStateRepo.findByUserId(us.userid)
+                    RbStudentStudyStateDTO rbStudentStudyStateDTO = new RbStudentStudyStateDTO()
+                    if (rbStudentStudyStateDao != null) {
+                        System.out.println("Student study state id: " + rbStudentStudyStateDao.stateId)
+                        rbStudentStudyStateDTO.stateId = rbStudentStudyStateDao.stateId
+                        System.out.println(rbStudentStudyStateDTO.stateId)
+                        rbStudentStudyStateDTO.userId = rbStudentStudyStateDao.userId
+                        rbStudentStudyStateDTO.topicId = rbStudentStudyStateDao.topicId
+                        rbStudentStudyStateDTO.videoLeftTime = rbStudentStudyStateDao.videoLeftTime
+                    }
+                    us.rbStudentStudyState = rbStudentStudyStateDTO
+                    MasStream masStreamDao = masStreamRepo.findByStreamIdAndIsActive(us.streamId, "t")
+                    List<MasSubjects> masSubjectsList = masSubjectsRepo.findByStreamIdAndYearIdAndIsActive(us.streamId, us.yearId, "t")
+
+                    log.info "Size of subjects for subscription id ${us.subscriptionId}:: ${masSubjectsList.size()}"
+                    for (MasSubjects masSubjects : masSubjectsList) {
+                        List<MasChapters> masChaptersList = new ArrayList<>()
+                        for (MasChapters masChapters1 : masSubjects.masChapters) {
+                            if (masChapters1 != null && masChapters1.isActive != null && masChapters1.isActive.equalsIgnoreCase("t")) {
+                                List<MasTopic> masTopicList = new ArrayList<>()
+                                for (MasTopic masTopic : masChapters1.mastopic) {
+                                    if (masTopic != null && masTopic.isActive != null && masTopic.isActive.equalsIgnoreCase("t")) {
+                                        masTopicList.add(masTopic)
+                                    }
+                                }
+                                masChapters1.mastopic = masTopicList
+                                masChaptersList.add(masChapters1)
+                            }
                         }
-                        for (MasTopic masTopic : masTopicList) {
-                            MasTopicStatus masTopicStatus = masTopicStatusRepo.findTopByTopicIdAndUseridOrderByTopicStatusIdDesc(masTopic.topicId, us.userid)
-                            if (masTopicStatus != null) {
-                                masTopic.masTopicStatus = masTopicStatus
+                        log.info "Size of chapters for subject id ${masSubjects.subjectId}:: ${masChaptersList.size()}"
+                        masSubjects.masChapters = masChaptersList
+                        // List<MasChapters> masChaptersList = masSubjects.masChapters
+                        for (MasChapters masChapters : masChaptersList) {
+                            List<MasTopic> masTopicList = masChapters.mastopic
+                            log.info "Size of topic chapter id ${masChapters.chapterId}:: ${masTopicList.size()}"
+                            //int totalCount =  masTopicList.size()
+                            //List<MasTopicStatus> masTopicStatusList = masTopicStatusRepo.findBySubjectIdAndUserid(masSubjects.subjectId,us.userid)
+                            //int progressCount = masTopicStatusList.size()
+                            /*if(totalCount != 0) {
+                                double percentage = progressCount / totalCount
+                                percentage = percentage*100
+                                masSubjects.percentage = percentage
+                            }*/
+                            for (MasTopic masTopic : masTopicList) {
+                                MasTopicStatus masTopicStatus = masTopicStatusRepo.findTopByTopicIdAndUseridOrderByTopicStatusIdDesc(masTopic.topicId, us.userid)
+                                if (masTopicStatus != null) {
+                                    masTopic.masTopicStatus = masTopicStatus
+                                }
                             }
                         }
                     }
+                    log.info "Completed subject list iteration"
+                    MasStreamDTO masStreamDTO = new MasStreamDTO()
+                    if (masStreamDao != null) {
+                        masStreamDTO.streamId = masStreamDao.streamId
+                        masStreamDTO.streamName = masStreamDao.streamName
+                        masStreamDTO.streamCode = masStreamDao.streamCode
+                        masStreamDTO.masSubjects = masSubjectsList
+                    }
+                    us.masStream = masStreamDTO
+                    MasCourseYear masCourseYearDao = masCourseYearRepo.findByYearIdAndIsActive(us.yearId, "t")
+                    us.masCourseYear = masCourseYearDao
+                    MasBoard masBoardDao = masBoardRepo.findByBoardIdAndIsActive(us.boardId, "t")
+                    MasBoardDTO masBoardDTO = new MasBoardDTO()
+                    if (masBoardDao != null) {
+                        masBoardDTO.boardId = masBoardDao.boardId
+                        masBoardDTO.boardName = masBoardDao.boardName
+                        masBoardDTO.boardCode = masBoardDao.boardCode
+                    }
+                    us.masBoard = masBoardDTO
+                    MasCourses masCoursesDao = masCoursesRepo.findByCourseIdAndIsActive(us.courseId, "t")
+                    MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
+                    if (masCoursesDao != null) {
+                        masCoursesDTO.courseId = masCoursesDao.courseId
+                        masCoursesDTO.courseName = masCoursesDao.courseName
+                        masCoursesDTO.courseCode = masCoursesDao.courseCode
+                        masCoursesDTO.coursePrice = masCoursesDao.coursePrice
+                    }
+                    us.masCourses = masCoursesDTO
+                    userSubscriptionsli.add(us)
                 }
-                MasStreamDTO masStreamDTO = new MasStreamDTO()
-                if (masStreamDTO != null) {
-                    masStreamDTO.streamId = masStreamDao.streamId
-                    masStreamDTO.streamName = masStreamDao.streamName
-                    masStreamDTO.streamCode = masStreamDao.streamCode
-                    masStreamDTO.masSubjects = masSubjectsList
-                }
-                us.masStream = masStreamDTO
-                MasCourseYear masCourseYearDao = masCourseYearRepo.findByYearId(us.yearId)
-                us.masCourseYear = masCourseYearDao
-                MasBoard masBoardDao = masBoardRepo.findByBoardId(us.boardId)
-                MasBoardDTO masBoardDTO = new MasBoardDTO()
-                if (masBoardDao != null) {
-                    masBoardDTO.boardId = masBoardDao.boardId
-                    masBoardDTO.boardName = masBoardDao.boardName
-                    masBoardDTO.boardCode = masBoardDao.boardCode
-                }
-                us.masBoard = masBoardDTO
-                MasCourses masCoursesDao = masCoursesRepo.findByCourseId(us.courseId)
-                MasCoursesDTO masCoursesDTO = new MasCoursesDTO()
-                if (masCoursesDao != null) {
-                    masCoursesDTO.courseId = masCoursesDao.courseId
-                    masCoursesDTO.courseName = masCoursesDao.courseName
-                    masCoursesDTO.courseCode = masCoursesDao.courseCode
-                    masCoursesDTO.coursePrice = masCoursesDao.coursePrice
-                }
-                us.masCourses = masCoursesDTO
-                userSubscriptionsli.add(us)
             }
+            log.info "Size of Subscription:: ${userSubscriptionsli.size()}"
             userDetails.userSubscriptions = userSubscriptionsli
         }
         userDetails
@@ -337,9 +370,11 @@ class StudentService {
             System.out.println("findByQuestionId...." + obj.questionId)
             log.info("findByQuestionId...." + obj.questionId)
             RbMultipleAnswers rbMultipleAnswers = rbMultipleAnswersRepo.findByQuestionId(obj.questionId)
-            System.out.println("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOptionId + "obj.givenAnswer" + obj.givenAnswer)
-            log.info("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOptionId + "obj.givenAnswer" + obj.givenAnswer)
-            if (rbMultipleAnswers.correctOptionId == obj.givenAnswer) {
+            System.out.println("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOption + "obj.givenAnswer" + obj.givenAnswer)
+            log.info("rbMultipleAnswers.correctOptionId.." + rbMultipleAnswers.correctOption + "obj.givenAnswer" + obj.givenAnswer)
+
+            RbMultipleOptions rbMultipleOptions = rbMultipleOptionsRepo.findByOptionId(obj.givenAnswer)
+            if (rbMultipleAnswers.correctOption.contains(rbMultipleOptions.possibleOption)) {
                 totalMarksScored = totalMarksScored + rbMultipleAnswers.marks
                 System.out.println("totalMarksScored.." + totalMarksScored)
                 log.info("totalMarksScored.." + totalMarksScored)
@@ -351,8 +386,8 @@ class StudentService {
         System.out.println("percentage.." + percentage)
         log.info("percentage.." + percentage)
         String result
-        System.out.println("percentagethreshold.." + percentagethreshold.toInteger())
-        log.info("percentagethreshold.." + percentagethreshold.toInteger())
+        System.out.println("percentage threshold.." + percentagethreshold.toInteger())
+        log.info("percentage threshold.." + percentagethreshold.toInteger())
         if (percentage > percentagethreshold.toInteger()) {
             result = "pass"
         } else {
@@ -399,7 +434,7 @@ class StudentService {
         masTopic.updatedAt = new Timestamp(new Date().getTime())
         if (masTopic.topicStatusId == null && masTopicStatusRepo.existsByTopicIdAndUserid(masTopic.topicId, masTopic.userid)) {
             //List<MasTopicStatus> li = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
-            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId,masTopic.userid)
+            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
         } else {
             masTopicStatusRepo.save(masTopic)
         }
@@ -420,7 +455,7 @@ class StudentService {
                     token: map.get("token").toString()
             )
             userLoginDetailsRepo.save(uld)
-           // true
+            // true
         } /*else if (!map.get("token").toString().equalsIgnoreCase(userLoginDetails.token)) {
             userLoginDetails.loginFlag = "t"
             userLoginDetails.updatedBy = "readby"
@@ -435,10 +470,10 @@ class StudentService {
 
     def UserLoginDetails getLogoutDetail(Map<String, String> map) {
         UserLoginDetails userLoginDetails = userLoginDetailsRepo.findByMobileNo(map.get("mobileNo").toLong())
-       /* userLoginDetails.loginFlag = "f"
-        userLoginDetails.updatedBy = "readby"
-        userLoginDetails.token = null
-        userLoginDetails.updatedAt = new Timestamp(new Date().getTime())*/
+        /* userLoginDetails.loginFlag = "f"
+         userLoginDetails.updatedBy = "readby"
+         userLoginDetails.token = null
+         userLoginDetails.updatedAt = new Timestamp(new Date().getTime())*/
         return userLoginDetailsRepo.delete(userLoginDetails)
 
     }
@@ -448,7 +483,8 @@ class StudentService {
     }
 
     def List<RbRandomQuiz> getRandomQuiz(Map<String, String> map) {
-        rbRandomQuizRepo.findBySubjectId(map.get("subjectId").toLong())
+
+        getRandomQuestions(rbRandomQuizRepo.findBySubjectIdAndImageFlag(map.get("subjectId").toLong(),"t"))
 
     }
 
@@ -456,5 +492,17 @@ class StudentService {
 
         rbRandomQuizResultRepo.save(rbRandomQuizResult)
 
+    }
+
+    public List<RbRandomQuiz> getRandomQuestions(List<RbRandomQuiz> questions) {
+        List<RbRandomQuiz> randomQuestions = new ArrayList<>()
+        List<RbRandomQuiz> copy = new ArrayList<>(questions)
+
+        SecureRandom rand = new SecureRandom();
+        for (int i = 0; i < Math.min(numberOfQuestions.toInteger(), questions.size()); i++) {
+            randomQuestions.add( copy.remove( rand.nextInt( copy.size() ) ))
+        }
+
+        return randomQuestions
     }
 }

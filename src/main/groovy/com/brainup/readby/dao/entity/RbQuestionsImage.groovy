@@ -13,40 +13,44 @@ import java.sql.Timestamp
 @Canonical
 @EqualsAndHashCode
 @Entity
-@Table(name = 'rb_questionnaires')
+@Table(name = 'rb_questions')
 @Getter
 @Setter
-class RbQuestionnaires implements Serializable{
+class RbQuestionsImage implements Serializable{
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = 'QID')
-    @JsonProperty(value = 'QID')
-    private Long qId
+    @Column(name = 'QUESTIONID')
+    @JsonProperty(value = 'QUESTIONID')
+    private Long questionId
 
-    @Column(name = 'TOPIC_ID')
-    @JsonProperty(value = 'TOPIC_ID')
-    private Long topicId
+    @Column(name = 'QUESTIONTITLE')
+    @JsonProperty(value = 'QUESTIONTITLE')
+    private String questionTitle
 
-    @Column(name = 'QNAME')
-    @JsonProperty(value = 'QNAME')
-    private String qName
+    @Column(name = 'QUESTIONDESC')
+    @JsonProperty(value = 'QUESTIONDESC')
+    private String questionDesc
 
-    @Column(name = 'DETAIL_DESC')
-    @JsonProperty(value = 'DETAIL_DESC')
-    private String detailDesc
-
-    @Column(name = 'QCOUNT')
-    @JsonProperty(value = 'QCOUNT')
-    private Integer qCount
-
-    @Column(name = 'IMAGEPATH')
-    @JsonProperty(value = 'IMAGEPATH')
-    private String imagePath
+    @Column(name = "QUESTIONNAIR_ID")
+    @JsonProperty(value = 'QUESTIONNAIR_ID')
+    private Long rbQuestionnaires
 
     @Column(name = 'IS_ACTIVE')
     @JsonProperty(value = 'IS_ACTIVE')
     private String isActive
+
+    @Column(name = 'ISANSWERED')
+    @JsonProperty(value = 'ISANSWERED')
+    private String isAnswered
+
+    @Column(name = 'ISMANDATORY')
+    @JsonProperty(value = 'ISMANDATORY')
+    private String isMandatory
+
+    @Column(name = 'ISRANDOMIZED')
+    @JsonProperty(value = 'ISRANDOMIZED')
+    private String isRandomized
 
     @Column(name = 'CREATED_AT')
     @JsonProperty(value = 'CREATED_AT')
@@ -68,11 +72,8 @@ class RbQuestionnaires implements Serializable{
     @JsonIgnore
     private String updatedBy
 
-    @OneToMany(mappedBy = "rbQuestionnaires", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonProperty(value = 'RB_QUESTIONS')
-    private List<RbQuestions> rbQuestions
+    @Column(name = 'QIMAGEPATH')
+    @JsonProperty(value = 'QIMAGEPATH')
+    private String qImagePath
 
-    @Transient
-    @JsonProperty(value = 'SUBJECT_ID')
-    private Long subjectId
 }

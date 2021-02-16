@@ -19,4 +19,6 @@ interface MasCoursesRepo  extends JpaRepository<MasCourses,Long> {
 
 
     def List<MasCourses> findByIsActiveOrderByCourseIdDesc(String isActive)
+
+    def MasCourses findByCourseIdAndIsActive(long aLong, String isActive)
 }

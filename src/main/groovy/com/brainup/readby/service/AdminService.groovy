@@ -11,6 +11,13 @@ import com.brainup.readby.dao.entity.MasStreamLkp
 import com.brainup.readby.dao.entity.MasSubjects
 import com.brainup.readby.dao.entity.MasTopic
 import com.brainup.readby.dao.entity.MasYearLkp
+import com.brainup.readby.dao.entity.RbMultipleAnswersDTO
+import com.brainup.readby.dao.entity.RbMultipleOptions
+import com.brainup.readby.dao.entity.RbQuestionType
+import com.brainup.readby.dao.entity.RbQuestionnaires
+import com.brainup.readby.dao.entity.RbQuestions
+import com.brainup.readby.dao.entity.RbQuestionsImage
+import com.brainup.readby.dao.entity.RbRandomQuiz
 import com.brainup.readby.dao.entity.UserDetails
 import com.brainup.readby.dao.entity.UserTransactionDetails
 import com.brainup.readby.dao.repository.MasBoardDPRepo
@@ -26,6 +33,12 @@ import com.brainup.readby.dao.repository.MasSubjectsRepo
 import com.brainup.readby.dao.repository.MasTopicDTORepo
 import com.brainup.readby.dao.repository.MasTopicRepo
 import com.brainup.readby.dao.repository.MasYearLkpRepo
+import com.brainup.readby.dao.repository.RbMultipleAnswersDTORepo
+import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
+import com.brainup.readby.dao.repository.RbMultipleOptionsRepo
+import com.brainup.readby.dao.repository.RbQuestionnairesRepo
+import com.brainup.readby.dao.repository.RbQuestionsRepo
+import com.brainup.readby.dao.repository.RbRandomQuizRepo
 import com.brainup.readby.dao.repository.UserDetailsRepo
 import com.brainup.readby.dao.repository.UserTransactionDetailsRepo
 import com.brainup.readby.dto.MasChaptersDTO
@@ -36,7 +49,9 @@ import com.brainup.readby.dto.UserDetailsDTO
 import com.brainup.readby.util.AmazonClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -100,6 +115,27 @@ class AdminService {
     @Autowired
     MasChaptersDTORepo masChaptersDTORepo
 
+    @Autowired
+    RbQuestionnairesRepo rbQuestionnairesRepo
+
+    @Autowired
+    RbMultipleAnswersDTORepo rbMultipleAnswersRepo
+
+    @Autowired
+    RbQuestionsRepo rbQuestionsRepo
+
+    @Autowired
+    RbMultipleOptionsRepo rbMultipleOptionsRepo
+
+    @Autowired
+    RbRandomQuizRepo rbRandomQuizRepo
+
+    @Value('${amazonProperties.childFolder}')
+    private String childFolder
+
+    @Value('${amazonProperties.questFolder}')
+    private String questFolder
+
 
     def Map<String, Long> getDashBoardDetail() {
         Map<String, Long> map = new LinkedHashMap<>()
@@ -141,7 +177,7 @@ class AdminService {
     }
 
     def MasCourses addCourses(MultipartFile file, String masCourse) {
-        String fileurl = this.amazonClient.uploadFile(file)
+        String fileurl = this.amazonClient.uploadFile(file,childFolder)
         log.info "fileurl: ${fileurl}"
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
         masCourses.iconPath = fileurl
@@ -160,8 +196,10 @@ class AdminService {
     def MasCourses editCourses(MultipartFile file, String masCourse) {
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
         String fileurl = masCourses.iconPath
-        if (file != null && file.size > 0)
-            fileurl = this.amazonClient.uploadFile(file)
+        if (file != null && file.size > 0) {
+            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            fileurl = this.amazonClient.uploadFile(file, childFolder)
+        }
         log.info "fileurl: ${fileurl}"
         masCourses.iconPath = fileurl
         return saveMasCourses(masCourses)
@@ -293,7 +331,7 @@ class AdminService {
 
     def MasSubjects addSubjects(MultipartFile multipartFile, String masSubjects) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
         log.info "fileurl: ${fileurl}"
         MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
         masSubjects1.iconPath = fileurl
@@ -317,8 +355,10 @@ class AdminService {
 
         MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
         String fileurl = masSubjects1.iconPath
-        if (file != null && file.size > 0)
-            fileurl = this.amazonClient.uploadFile(file)
+        if (file != null && file.size > 0) {
+            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            fileurl = this.amazonClient.uploadFile(file, childFolder)
+        }
         log.info "fileurl: ${fileurl}"
         masSubjects1.iconPath = fileurl
         masSubjects1.updatedBy = "Admin"
@@ -358,7 +398,7 @@ class AdminService {
 
     def MasChaptersDTO addChapters(MultipartFile multipartFile, String masChapters) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
         log.info "fileurl: ${fileurl}"
         MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
         masChapters1.iconPath = fileurl
@@ -370,8 +410,10 @@ class AdminService {
     def MasChaptersDTO editChapters(MultipartFile file, String masChapters) {
         MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
         String fileurl = masChapters1.iconPath
-        if (file != null && file.size > 0)
-            fileurl = this.amazonClient.uploadFile(file)
+        if (file != null && file.size > 0) {
+            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            fileurl = this.amazonClient.uploadFile(file, childFolder)
+        }
         log.info "fileurl: ${fileurl}"
         masChapters1.iconPath = fileurl
         masChapters1.updatedBy = "readby-admin"
@@ -400,7 +442,7 @@ class AdminService {
 
     def MasTopicDTO addTopics(MultipartFile multipartFile, String masTopics) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile)
+        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
         log.info "fileurl: ${fileurl}"
         MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
         masTopic.iconPath = fileurl
@@ -411,8 +453,10 @@ class AdminService {
     def MasTopicDTO editTopics(MultipartFile file, String masTopics) {
         MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
         String fileurl = masTopic.iconPath
-        if (file != null && file.size > 0)
-            fileurl = this.amazonClient.uploadFile(file)
+        if (file != null && file.size > 0) {
+            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            fileurl = this.amazonClient.uploadFile(file, childFolder)
+        }
         log.info "fileurl: ${fileurl}"
         masTopic.iconPath = fileurl
         masTopic.updatedBy = "readby-admin"
@@ -481,5 +525,93 @@ class AdminService {
 
     def MasYearLkp addYear(MasYearLkp masYearLkp) {
         masYearLkpRepo.save(masYearLkp)
+    }
+
+    def String addRbQuestionnaires(RbQuestionnaires rbQuestionnaires) {
+        RbQuestionnaires rbQuestionnairesDB = rbQuestionnairesRepo.save(rbQuestionnaires)
+        saveQuestionDetails(rbQuestionnairesDB)
+
+        return "question added successfully"
+    }
+
+    def String editQuestionAnswer(RbQuestionnaires rbQuestionnaires) {
+        rbQuestionnairesRepo.save(rbQuestionnaires)
+        saveQuestionDetails(rbQuestionnaires)
+        return "question edited successfully"
+    }
+
+    def saveQuestionDetails(RbQuestionnaires rbQuestionnairesDB){
+
+        List<RbQuestions> li = rbQuestionnairesDB.rbQuestions
+        for(RbQuestions rbQuestions : li){
+            List<RbMultipleOptions> rbMultipleOptionsli = rbQuestions.rbMultipleOptions
+            for(RbMultipleOptions rbMultipleOptions : rbMultipleOptionsli){
+                rbMultipleOptions.rbQuestions = rbQuestions
+                rbMultipleOptions.createdBy = "readby-admin"
+                rbMultipleOptionsRepo.save(rbMultipleOptions)
+            }
+            List<RbMultipleAnswersDTO> rbMultipleAnswersli = rbQuestions.rbMultipleAnswers
+            for(RbMultipleAnswersDTO rbMultipleAnswersDTO : rbMultipleAnswersli){
+                rbMultipleAnswersDTO.rbQuestions = rbQuestions
+                rbMultipleAnswersDTO.createdBy = "readby-admin"
+                rbMultipleAnswersRepo.save(rbMultipleAnswersDTO)
+            }
+            rbQuestions.rbQuestionnaires=  rbQuestionnairesDB
+            if(!StringUtils.isNotBlank(rbQuestions.qImagePath))
+            rbQuestions.qImagePath = " "
+            rbQuestions.createdBy = "readby-admin"
+            rbQuestionsRepo.save(rbQuestions)
+
+            RbRandomQuiz rbRandomQuiz = new RbRandomQuiz()
+            rbRandomQuiz.subjectId = rbQuestionnairesDB.subjectId
+            rbRandomQuiz.qustnCode = rbQuestions.questionTitle
+            rbRandomQuiz.qustnDsc = rbQuestions.questionDesc
+            rbRandomQuiz.questionId = rbQuestions.questionId
+            rbRandomQuiz.imageFlag = "t"
+
+            rbRandomQuiz.optn1 = rbQuestions.rbMultipleOptions.size() >= 1 ? rbQuestions.rbMultipleOptions.get(0).possibleOption : ""
+            rbRandomQuiz.optn2 = rbQuestions.rbMultipleOptions.size() >= 2 ? rbQuestions.rbMultipleOptions.get(1).possibleOption : ""
+            rbRandomQuiz.optn3 = rbQuestions.rbMultipleOptions.size() >= 3 ? rbQuestions.rbMultipleOptions.get(2).possibleOption : ""
+            rbRandomQuiz.optn4 = rbQuestions.rbMultipleOptions.size() >= 4 ? rbQuestions.rbMultipleOptions.get(3).possibleOption : ""
+            rbRandomQuiz.crrctOptn = rbQuestions.rbMultipleAnswers.get(0).correctOption
+            rbRandomQuizRepo.save(rbRandomQuiz)
+        }
+    }
+
+    def List<RbQuestionnaires> getQuestionList(Map<String, String> map) {
+        List<RbQuestionnaires> rbQuestionnairesList = rbQuestionnairesRepo.findByIsActive("t")
+        List<RbQuestionnaires> rbQuestionnairesli = new ArrayList<>()
+        for(RbQuestionnaires rbQuestionnaires : rbQuestionnairesList){
+            if(rbQuestionnaires.isActive.equalsIgnoreCase("t")) {
+                List<RbQuestions> rbQuestionsList = rbQuestionnaires.rbQuestions
+                List<RbQuestions> rbqli = new ArrayList<>()
+                for (RbQuestions rbQuestions : rbQuestionsList){
+                    if(rbQuestions.isActive.equalsIgnoreCase("t")){
+                        rbqli.add(rbQuestions)
+                    }
+                }
+                rbQuestionnaires.rbQuestions = rbqli
+                rbQuestionnairesli.add(rbQuestionnaires)
+            }
+        }
+        rbQuestionnairesli
+    }
+
+    def String uploadQuestImage(MultipartFile file, String rbQuestion) {
+        RbQuestionsImage rbQuestions = new ObjectMapper().readValue(rbQuestion, RbQuestionsImage.class)
+        String fileurl = rbQuestions.qImagePath
+        if (file != null && file.size > 0) {
+            this.amazonClient.deleteFileFromS3Bucket(fileurl,questFolder)
+            fileurl = this.amazonClient.uploadFile(file, questFolder)
+        }
+        log.info "fileurl: ${fileurl}"
+        rbQuestions.qImagePath = fileurl
+        rbQuestions.updatedBy = "readby-admin"
+
+        RbRandomQuiz rbRandomQuiz = rbRandomQuizRepo.findByQuestionId(rbQuestions.questionId)
+        rbRandomQuiz.imageFlag = "f"
+        rbRandomQuizRepo.save(rbRandomQuiz)
+
+        rbQuestionsRepo.save(rbQuestions)
     }
 }
