@@ -572,6 +572,36 @@ class ReadByAdminController {
             throw new BadRequestException(ex.message)
         }
     }
+
+    @DeleteMapping(value = "/deleteQuestionair")
+    ResponseEntity deleteQuestionair(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteQuestionair service for admin."
+            String msg = adminService.deleteQuestionair(map.get("qId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    @DeleteMapping(value = "/deleteQuestion")
+    ResponseEntity deleteQuestion(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling deleteQuestion service for admin."
+            String msg = adminService.deleteQuestion(map.get("questionId").toLong())
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = msg
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
 }
 
 

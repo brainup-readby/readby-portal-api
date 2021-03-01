@@ -14,6 +14,8 @@ import com.brainup.readby.dao.entity.OtpInfo
 import com.brainup.readby.dao.entity.RbMultipleAnswers
 import com.brainup.readby.dao.entity.RbMultipleOptions
 import com.brainup.readby.dao.entity.RbQuestionnaires
+import com.brainup.readby.dao.entity.RbQuestions
+import com.brainup.readby.dao.entity.RbQuestionsImage
 import com.brainup.readby.dao.entity.RbRandomQuiz
 import com.brainup.readby.dao.entity.RbRandomQuizResult
 import com.brainup.readby.dao.entity.RbStudentAnswers
@@ -37,6 +39,7 @@ import com.brainup.readby.dao.repository.OtpInfoRepo
 import com.brainup.readby.dao.repository.RbMultipleAnswersRepo
 import com.brainup.readby.dao.repository.RbMultipleOptionsRepo
 import com.brainup.readby.dao.repository.RbQuestionnairesRepo
+import com.brainup.readby.dao.repository.RbQuestionsRepo
 import com.brainup.readby.dao.repository.RbRandomQuizRepo
 import com.brainup.readby.dao.repository.RbRandomQuizResultRepo
 import com.brainup.readby.dao.repository.RbStudentAnswersRepo
@@ -142,6 +145,9 @@ class StudentService {
 
     @Autowired
     MasTopicStatusRepo masTopicStatusRepo
+
+    @Autowired
+    RbQuestionsRepo rbQuestionsRepo
 
     @Value('${readby.otp.url}')
     private String otpUrl
@@ -358,7 +364,12 @@ class StudentService {
     }
 
     def RbQuestionnaires getQuestionByTopic(Map<String, String> map) {
-        rbQuestionnairesRepo.findByTopicId(map.get("topicId").toLong())
+        RbQuestionnaires rbQuestionnaires = rbQuestionnairesRepo.findFirstByTopicIdOrderByCreatedAtDesc(map.get("topicId").toLong())
+        if(rbQuestionnaires != null) {
+            List<RbQuestions> questionsList = getRandomRbQuestions(rbQuestionnaires.rbQuestions, rbQuestionnaires.randomQCount)
+            rbQuestionnaires.rbQuestions = questionsList
+        }
+        return rbQuestionnaires
     }
 
     def RbStudentReport saveStudentAnswer(List<RbStudentAnswers> rbStudentAnswers) {
@@ -380,24 +391,32 @@ class StudentService {
                 log.info("totalMarksScored.." + totalMarksScored)
             }
         }
-        System.out.println("maxMarks.." + maxMarks.toInteger())
+        RbQuestions rbQuestions = rbQuestionsRepo.findTopByQuestionIdOrderByQuestionIdDesc(rbStudentAnswered.get(0).questionId)
+        RbQuestionnaires rbQuestionnaires = rbQuestionnairesRepo.findByqId(rbQuestions.rbQuestionnaires.qId)
+        String result
+        if(rbQuestionnaires.passingMarks <= totalMarksScored){
+            result = "pass"
+        } else {
+            result = "fail"
+        }
+        int percentage = totalMarksScored / rbQuestionnaires.maxMarks * 100
+       /* System.out.println("maxMarks.." + maxMarks.toInteger())
         log.info("maxMarks.." + maxMarks.toInteger())
         int percentage = totalMarksScored / maxMarks.toInteger() * 100
         System.out.println("percentage.." + percentage)
         log.info("percentage.." + percentage)
-        String result
         System.out.println("percentage threshold.." + percentagethreshold.toInteger())
         log.info("percentage threshold.." + percentagethreshold.toInteger())
         if (percentage > percentagethreshold.toInteger()) {
             result = "pass"
         } else {
             result = "fail"
-        }
+        }*/
         RbStudentReport rbStudentReport = new RbStudentReport(
                 topicId: rbStudentAnswers.get(0).topicId,
                 userId: rbStudentAnswers.get(0).userId,
                 totalMarksObtained: totalMarksScored,
-                maximumMarks: maxMarks.toInteger(),
+                maximumMarks: rbQuestionnaires.maxMarks,
                 totalPercentage: percentage,
                 overallResult: result
         )
@@ -500,6 +519,18 @@ class StudentService {
 
         SecureRandom rand = new SecureRandom();
         for (int i = 0; i < Math.min(numberOfQuestions.toInteger(), questions.size()); i++) {
+            randomQuestions.add( copy.remove( rand.nextInt( copy.size() ) ))
+        }
+
+        return randomQuestions
+    }
+
+    public List<RbQuestions> getRandomRbQuestions(List<RbQuestions> questions,Integer noOfQuest) {
+        List<RbQuestions> randomQuestions = new ArrayList<>()
+        List<RbQuestions> copy = new ArrayList<>(questions)
+
+        SecureRandom rand = new SecureRandom();
+        for (int i = 0; i < Math.min(noOfQuest, questions.size()); i++) {
             randomQuestions.add( copy.remove( rand.nextInt( copy.size() ) ))
         }
 

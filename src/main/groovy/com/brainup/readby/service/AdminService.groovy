@@ -553,6 +553,7 @@ class AdminService {
             List<RbMultipleAnswersDTO> rbMultipleAnswersli = rbQuestions.rbMultipleAnswers
             for(RbMultipleAnswersDTO rbMultipleAnswersDTO : rbMultipleAnswersli){
                 rbMultipleAnswersDTO.rbQuestions = rbQuestions
+                rbMultipleAnswersDTO.marks = rbQuestionnairesDB.perQuestMarks
                 rbMultipleAnswersDTO.createdBy = "readby-admin"
                 rbMultipleAnswersRepo.save(rbMultipleAnswersDTO)
             }
@@ -613,5 +614,19 @@ class AdminService {
         rbRandomQuizRepo.save(rbRandomQuiz)
 
         rbQuestionsRepo.save(rbQuestions)
+    }
+
+    def String deleteQuestionair(long qId) {
+        RbQuestionnaires rbQuestionnaires = rbQuestionnairesRepo.findByqId(qId)
+        rbQuestionnaires.isActive = "f"
+        RbQuestionnaires rbQuestionnaires1 = rbQuestionnairesRepo.save(rbQuestionnaires)
+        return "Questionnaires deleted successfully"
+    }
+
+    def String deleteQuestion(long questionId) {
+        RbQuestions rbQuestions = rbQuestionsRepo.findByQuestionId(questionId)
+        rbQuestions.isActive = "f"
+        rbQuestionsRepo.save(rbQuestions)
+        return "Question deleted successfully"
     }
 }

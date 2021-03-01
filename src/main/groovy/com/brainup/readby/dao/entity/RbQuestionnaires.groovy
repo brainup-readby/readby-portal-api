@@ -72,7 +72,24 @@ class RbQuestionnaires implements Serializable{
     @JsonProperty(value = 'RB_QUESTIONS')
     private List<RbQuestions> rbQuestions
 
+    @Column(name = 'RANDOMQCOUNT')
+    @JsonProperty(value = 'RANDOMQCOUNT')
+    private Integer randomQCount
+
+    @Column(name = 'MAX_MARKS')
+    @JsonProperty(value = 'MAX_MARKS')
+    private Integer maxMarks
+
+    @Column(name = 'PASSING_MARKS')
+    @JsonProperty(value = 'PASSING_MARKS')
+    private Integer passingMarks
+
+    @Transient
+    @JsonProperty(value = 'PERQUESTMARKS')
+    private Integer perQuestMarks
+
     @Transient
     @JsonProperty(value = 'SUBJECT_ID')
     private Long subjectId
+
 }

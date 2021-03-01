@@ -11,4 +11,11 @@ interface RbQuestionnairesRepo extends JpaRepository<RbQuestionnaires,Long> {
 
     def List<RbQuestionnaires> findByIsActive(String isActive)
 
+    //def RbQuestionnaires findByQId(long qId)
+
+    def RbQuestionnaires findByqId(long l)
+
+    //def RbQuestionnaires findTopByTopicIdOrderByqIdDesc(long aLong)
+
+    def RbQuestionnaires findFirstByTopicIdOrderByCreatedAtDesc(long aLong)
 }

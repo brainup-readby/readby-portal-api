@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface RbQuestionsRepo extends JpaRepository<RbQuestions,Long> {
 
+    def RbQuestions findByQuestionId(long questionId)
+
+    def RbQuestions findTopByQuestionIdOrderByQuestionIdDesc(long questionId)
 }

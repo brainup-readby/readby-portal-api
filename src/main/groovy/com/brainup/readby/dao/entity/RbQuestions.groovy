@@ -89,4 +89,9 @@ class RbQuestions implements Serializable{
     @JsonProperty(value = 'RB_MULTIPLE_ANSWER')
     private List<RbMultipleAnswersDTO> rbMultipleAnswers
 
+
+    @Transient
+    @JsonProperty(value = 'MARKS')
+    private Integer marks
+
 }
