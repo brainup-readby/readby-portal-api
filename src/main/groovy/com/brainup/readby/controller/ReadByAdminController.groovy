@@ -271,6 +271,21 @@ class ReadByAdminController {
         }
     }
 
+    @PostMapping(value = "/copySubjects")
+    ResponseEntity copySubjects(@RequestBody MasSubjects masSubjects) {
+        try {
+
+            MasSubjects masSubjects1 = adminService.copySubject(masSubjects)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masSubjects1
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception ex) {
+            log.error " ${ex.message}"
+            throw new BadRequestException(ex.message)
+        }
+    }
+
     @PostMapping(value = "/editSubjects", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
     ResponseEntity<Object> editSubjects(@RequestParam("file") MultipartFile file, @RequestParam("masSubjects") String masSubjects) {
         try {

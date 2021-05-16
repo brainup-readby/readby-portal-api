@@ -364,9 +364,16 @@ class StudentService {
     }
 
     def RbQuestionnaires getQuestionByTopic(Map<String, String> map) {
-        RbQuestionnaires rbQuestionnaires = rbQuestionnairesRepo.findFirstByTopicIdOrderByCreatedAtDesc(map.get("topicId").toLong())
+        RbQuestionnaires rbQuestionnaires = rbQuestionnairesRepo.findTopByTopicIdAndIsActiveOrderByCreatedAtDesc(map.get("topicId").toLong(),"t")
         if(rbQuestionnaires != null) {
-            List<RbQuestions> questionsList = getRandomRbQuestions(rbQuestionnaires.rbQuestions, rbQuestionnaires.randomQCount)
+            List<RbQuestions> rbQuestionsList = rbQuestionnaires.rbQuestions
+            List<RbQuestions> rbqli = new ArrayList<>()
+            for (RbQuestions rbQuestions : rbQuestionsList){
+                if(rbQuestions.isActive.equalsIgnoreCase("t")){
+                    rbqli.add(rbQuestions)
+                }
+            }
+            List<RbQuestions> questionsList = getRandomRbQuestions(rbqli, rbQuestionnaires.randomQCount)
             rbQuestionnaires.rbQuestions = questionsList
         }
         return rbQuestionnaires
@@ -453,10 +460,10 @@ class StudentService {
         masTopic.updatedAt = new Timestamp(new Date().getTime())
         if (masTopic.topicStatusId == null && masTopicStatusRepo.existsByTopicIdAndUserid(masTopic.topicId, masTopic.userid)) {
             //List<MasTopicStatus> li = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
-            masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
-        } else {
-            masTopicStatusRepo.save(masTopic)
+            MasTopicStatus masTopicStatus = masTopicStatusRepo.findByTopicIdAndUserid(masTopic.topicId, masTopic.userid)
+            masTopic.topicStatusId = masTopicStatus.topicStatusId
         }
+            masTopicStatusRepo.save(masTopic)
     }
 
     def UserLoginDetails getLoginDetail(Map<String, String> map) {
@@ -493,7 +500,8 @@ class StudentService {
          userLoginDetails.updatedBy = "readby"
          userLoginDetails.token = null
          userLoginDetails.updatedAt = new Timestamp(new Date().getTime())*/
-        return userLoginDetailsRepo.delete(userLoginDetails)
+        userLoginDetails != null ? userLoginDetailsRepo.delete(userLoginDetails) : null
+        userLoginDetails
 
     }
 

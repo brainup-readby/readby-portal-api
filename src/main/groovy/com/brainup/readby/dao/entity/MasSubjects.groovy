@@ -102,4 +102,8 @@ class MasSubjects implements Serializable{
     @JsonProperty(value = 'COURSE_ID')
     private Long courseId
 
+    @Transient
+    @JsonProperty(value = 'SRC_SUB_ID')
+    private Long srcSubId
+
 }

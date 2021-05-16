@@ -56,6 +56,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
+import javax.transaction.Transactional
 import java.sql.Timestamp
 import java.util.stream.Collectors
 
@@ -166,8 +167,8 @@ class AdminService {
         List<MasCourses> masCoursesList = masCoursesRepo.findAll()
         List<MasCourses> li = new ArrayList<MasCourses>()
 
-        for(MasCourses masCourses : masCoursesList){
-            if(masCourses.boardId != null) {
+        for (MasCourses masCourses : masCoursesList) {
+            if (masCourses.boardId != null) {
                 MasBoardDP masBoardDP = masBoardDPRepo.findByBoardId(masCourses.boardId)
                 masCourses.boardName = masBoardDP.boardName
             }
@@ -177,7 +178,7 @@ class AdminService {
     }
 
     def MasCourses addCourses(MultipartFile file, String masCourse) {
-        String fileurl = this.amazonClient.uploadFile(file,childFolder)
+        String fileurl = this.amazonClient.uploadFile(file, childFolder)
         log.info "fileurl: ${fileurl}"
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
         masCourses.iconPath = fileurl
@@ -197,7 +198,7 @@ class AdminService {
         MasCourses masCourses = new ObjectMapper().readValue(masCourse, MasCourses.class)
         String fileurl = masCourses.iconPath
         if (file != null && file.size > 0) {
-            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            this.amazonClient.deleteFileFromS3Bucket(fileurl, childFolder)
             fileurl = this.amazonClient.uploadFile(file, childFolder)
         }
         log.info "fileurl: ${fileurl}"
@@ -236,11 +237,11 @@ class AdminService {
     }
 
     def List<MasStreamLkp> getMasStreamList(Long courseId) {
-        masStreamLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t",courseId)
+        masStreamLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t", courseId)
     }
 
     def List<MasYearLkp> getMasYearList(Long courseId) {
-        masYearLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t",courseId)
+        masYearLkpRepo.findByIsActiveIgnoreCaseAndCourseId("t", courseId)
     }
 
     def List<UserTransactionDetails> getUserTransactionList() {
@@ -314,8 +315,8 @@ class AdminService {
             masSubjectsDTO.streamId = masSubjects.streamId
             MasStream masStream = masStreamRepo.findByStreamId(masSubjects.streamId)
 
-            if(masStream.masCourses != null && masStream.masCourses.courseId !=null)
-            masSubjectsDTO.courseId = masStream.masCourses.courseId
+            if (masStream.masCourses != null && masStream.masCourses.courseId != null)
+                masSubjectsDTO.courseId = masStream.masCourses.courseId
 
             masSubjectsDTO.streamName = masStream.streamName
             masSubjectsDTO.streamCode = masStream.streamCode
@@ -331,22 +332,22 @@ class AdminService {
 
     def MasSubjects addSubjects(MultipartFile multipartFile, String masSubjects) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
+        String fileurl = this.amazonClient.uploadFile(multipartFile, childFolder)
         log.info "fileurl: ${fileurl}"
         MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
         masSubjects1.iconPath = fileurl
         masSubjects1.createdBy = "Admin"
-       /* MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
+        /* MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
 
-        MasStream ms = masSubjects1.masStream
-        ms.masCourses = masCoursesDB
-        MasStream masStream = masStreamRepo.save(ms)
-        masSubjects1.streamId = masStream.streamId
+         MasStream ms = masSubjects1.masStream
+         ms.masCourses = masCoursesDB
+         MasStream masStream = masStreamRepo.save(ms)
+         masSubjects1.streamId = masStream.streamId
 
-        MasCourseYear my = masSubjects1.masCourseYear
-         my.masCourses = masCoursesDB
-        MasCourseYear masCourseYear = masCourseYearRepo.save(my)
-        masSubjects1.yearId = masCourseYear.yearId8*/
+         MasCourseYear my = masSubjects1.masCourseYear
+          my.masCourses = masCoursesDB
+         MasCourseYear masCourseYear = masCourseYearRepo.save(my)
+         masSubjects1.yearId = masCourseYear.yearId8*/
 
         return masSubjectsRepo.save(masSubjects1)
     }
@@ -356,23 +357,23 @@ class AdminService {
         MasSubjects masSubjects1 = new ObjectMapper().readValue(masSubjects, MasSubjects.class)
         String fileurl = masSubjects1.iconPath
         if (file != null && file.size > 0) {
-            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            this.amazonClient.deleteFileFromS3Bucket(fileurl, childFolder)
             fileurl = this.amazonClient.uploadFile(file, childFolder)
         }
         log.info "fileurl: ${fileurl}"
         masSubjects1.iconPath = fileurl
         masSubjects1.updatedBy = "Admin"
-      /*  MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
+        /*  MasCourses masCoursesDB = masCoursesRepo.findByCourseId(masSubjects1.courseId)
 
-        MasStream ms = masSubjects1.masStream
-        ms.masCourses = masCoursesDB
-        MasStream masStream = masStreamRepo.save(ms)
-        masSubjects1.streamId = masStream.streamId
+          MasStream ms = masSubjects1.masStream
+          ms.masCourses = masCoursesDB
+          MasStream masStream = masStreamRepo.save(ms)
+          masSubjects1.streamId = masStream.streamId
 
-        MasCourseYear my = masSubjects1.masCourseYear
-        my.masCourses = masCoursesDB
-        MasCourseYear masCourseYear = masCourseYearRepo.save(my)
-        masSubjects1.yearId = masCourseYear.yearId*/
+          MasCourseYear my = masSubjects1.masCourseYear
+          my.masCourses = masCoursesDB
+          MasCourseYear masCourseYear = masCourseYearRepo.save(my)
+          masSubjects1.yearId = masCourseYear.yearId*/
 
         return masSubjectsRepo.save(masSubjects1)
     }
@@ -398,7 +399,7 @@ class AdminService {
 
     def MasChaptersDTO addChapters(MultipartFile multipartFile, String masChapters) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
+        String fileurl = this.amazonClient.uploadFile(multipartFile, childFolder)
         log.info "fileurl: ${fileurl}"
         MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
         masChapters1.iconPath = fileurl
@@ -411,7 +412,7 @@ class AdminService {
         MasChaptersDTO masChapters1 = new ObjectMapper().readValue(masChapters, MasChaptersDTO.class)
         String fileurl = masChapters1.iconPath
         if (file != null && file.size > 0) {
-            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            this.amazonClient.deleteFileFromS3Bucket(fileurl, childFolder)
             fileurl = this.amazonClient.uploadFile(file, childFolder)
         }
         log.info "fileurl: ${fileurl}"
@@ -442,7 +443,7 @@ class AdminService {
 
     def MasTopicDTO addTopics(MultipartFile multipartFile, String masTopics) {
 
-        String fileurl = this.amazonClient.uploadFile(multipartFile,childFolder)
+        String fileurl = this.amazonClient.uploadFile(multipartFile, childFolder)
         log.info "fileurl: ${fileurl}"
         MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
         masTopic.iconPath = fileurl
@@ -454,7 +455,7 @@ class AdminService {
         MasTopicDTO masTopic = new ObjectMapper().readValue(masTopics, MasTopicDTO.class)
         String fileurl = masTopic.iconPath
         if (file != null && file.size > 0) {
-            this.amazonClient.deleteFileFromS3Bucket(fileurl,childFolder)
+            this.amazonClient.deleteFileFromS3Bucket(fileurl, childFolder)
             fileurl = this.amazonClient.uploadFile(file, childFolder)
         }
         log.info "fileurl: ${fileurl}"
@@ -488,9 +489,9 @@ class AdminService {
 
     def List<MasSubjectsDTO> getSubjectByStreamOrYear(Map<String, String> map) {
         List<MasSubjects> masSubjectsList
-        if(map.get("streamId") != null){
+        if (map.get("streamId") != null) {
             masSubjectsList = masSubjectsRepo.findByStreamId(map.get("streamId").toLong())
-        }else{
+        } else {
             masSubjectsList = masSubjectsRepo.findByYearId(map.get("yearId").toLong())
         }
         List<MasSubjectsDTO> li = new ArrayList<>()
@@ -504,9 +505,9 @@ class AdminService {
             masSubjectsDTO.streamId = masSubjects.streamId
             MasStream masStream = masStreamRepo.findByStreamId(masSubjects.streamId)
 
-            if(masStream.masCourses != null && masStream.masCourses.courseId !=null)
-            masSubjectsDTO.courseId = masStream.masCourses.courseId
-            
+            if (masStream.masCourses != null && masStream.masCourses.courseId != null)
+                masSubjectsDTO.courseId = masStream.masCourses.courseId
+
             masSubjectsDTO.streamName = masStream.streamName
             masSubjectsDTO.streamCode = masStream.streamCode
             masSubjectsDTO.yearId = masSubjects.yearId
@@ -540,26 +541,26 @@ class AdminService {
         return "question edited successfully"
     }
 
-    def saveQuestionDetails(RbQuestionnaires rbQuestionnairesDB){
+    def saveQuestionDetails(RbQuestionnaires rbQuestionnairesDB) {
 
         List<RbQuestions> li = rbQuestionnairesDB.rbQuestions
-        for(RbQuestions rbQuestions : li){
+        for (RbQuestions rbQuestions : li) {
             List<RbMultipleOptions> rbMultipleOptionsli = rbQuestions.rbMultipleOptions
-            for(RbMultipleOptions rbMultipleOptions : rbMultipleOptionsli){
+            for (RbMultipleOptions rbMultipleOptions : rbMultipleOptionsli) {
                 rbMultipleOptions.rbQuestions = rbQuestions
                 rbMultipleOptions.createdBy = "readby-admin"
                 rbMultipleOptionsRepo.save(rbMultipleOptions)
             }
             List<RbMultipleAnswersDTO> rbMultipleAnswersli = rbQuestions.rbMultipleAnswers
-            for(RbMultipleAnswersDTO rbMultipleAnswersDTO : rbMultipleAnswersli){
+            for (RbMultipleAnswersDTO rbMultipleAnswersDTO : rbMultipleAnswersli) {
                 rbMultipleAnswersDTO.rbQuestions = rbQuestions
                 rbMultipleAnswersDTO.marks = rbQuestionnairesDB.perQuestMarks
                 rbMultipleAnswersDTO.createdBy = "readby-admin"
                 rbMultipleAnswersRepo.save(rbMultipleAnswersDTO)
             }
-            rbQuestions.rbQuestionnaires=  rbQuestionnairesDB
-            if(!StringUtils.isNotBlank(rbQuestions.qImagePath))
-            rbQuestions.qImagePath = " "
+            rbQuestions.rbQuestionnaires = rbQuestionnairesDB
+            if (!StringUtils.isNotBlank(rbQuestions.qImagePath))
+                rbQuestions.qImagePath = " "
             rbQuestions.createdBy = "readby-admin"
             rbQuestionsRepo.save(rbQuestions)
 
@@ -582,12 +583,12 @@ class AdminService {
     def List<RbQuestionnaires> getQuestionList(Map<String, String> map) {
         List<RbQuestionnaires> rbQuestionnairesList = rbQuestionnairesRepo.findByIsActive("t")
         List<RbQuestionnaires> rbQuestionnairesli = new ArrayList<>()
-        for(RbQuestionnaires rbQuestionnaires : rbQuestionnairesList){
-            if(rbQuestionnaires.isActive.equalsIgnoreCase("t")) {
+        for (RbQuestionnaires rbQuestionnaires : rbQuestionnairesList) {
+            if (rbQuestionnaires.isActive.equalsIgnoreCase("t")) {
                 List<RbQuestions> rbQuestionsList = rbQuestionnaires.rbQuestions
                 List<RbQuestions> rbqli = new ArrayList<>()
-                for (RbQuestions rbQuestions : rbQuestionsList){
-                    if(rbQuestions.isActive.equalsIgnoreCase("t")){
+                for (RbQuestions rbQuestions : rbQuestionsList) {
+                    if (rbQuestions.isActive.equalsIgnoreCase("t")) {
                         rbqli.add(rbQuestions)
                     }
                 }
@@ -602,7 +603,7 @@ class AdminService {
         RbQuestionsImage rbQuestions = new ObjectMapper().readValue(rbQuestion, RbQuestionsImage.class)
         String fileurl = rbQuestions.qImagePath
         if (file != null && file.size > 0) {
-            this.amazonClient.deleteFileFromS3Bucket(fileurl,questFolder)
+            this.amazonClient.deleteFileFromS3Bucket(fileurl, questFolder)
             fileurl = this.amazonClient.uploadFile(file, questFolder)
         }
         log.info "fileurl: ${fileurl}"
@@ -628,5 +629,43 @@ class AdminService {
         rbQuestions.isActive = "f"
         rbQuestionsRepo.save(rbQuestions)
         return "Question deleted successfully"
+    }
+
+    @Transactional
+    def MasSubjects copySubject(MasSubjects masSubjects) {
+        MasSubjects masSubjects1 = masSubjectsRepo.save(masSubjects)
+
+        MasSubjects masSubjects2 = masSubjectsRepo.findBySubjectId(masSubjects.srcSubId)
+        log.info("Total number of chapter to be copied: "+masSubjects2.masChapters.size())
+
+        for (MasChapters masChapter : masSubjects2.masChapters) {
+            MasChaptersDTO newChapters = new MasChaptersDTO(
+                    chapterName: masChapter.chapterName,
+                    chapterCode: masChapter.chapterCode,
+                    isActive: masChapter.isActive,
+                    iconPath: masChapter.iconPath,
+                    createdBy: "readby-admin",
+                    subjectId: masSubjects1.subjectId
+            )
+            MasChaptersDTO masChapters1 = masChaptersDTORepo.save(newChapters)
+            log.info("Total number of topic to be copied for chapter  ${masChapter.chapterName}: "+masChapter.mastopic.size())
+
+            for (MasTopic masTopics : masChapter.mastopic) {
+
+                MasTopicDTO newTopic = new MasTopicDTO(
+                        topicName: masTopics.topicName,
+                        topicCode: masTopics.topicCode,
+                        isActive: masTopics.isActive,
+                        iconPath: masTopics.iconPath,
+                        videoUrl: masTopics.videoUrl,
+                        booKUrl: masTopics.booKUrl,
+                        chapterId: masChapters1.chapterId,
+                        topicSubscription: masTopics.topicSubscription,
+                        createdBy: "readby-admin"
+                )
+                MasTopicDTO masTopic = masTopicDTORepo.save(newTopic)
+            }
+        }
+        masSubjects1
     }
 }

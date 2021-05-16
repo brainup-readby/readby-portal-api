@@ -18,4 +18,8 @@ interface RbQuestionnairesRepo extends JpaRepository<RbQuestionnaires,Long> {
     //def RbQuestionnaires findTopByTopicIdOrderByqIdDesc(long aLong)
 
     def RbQuestionnaires findFirstByTopicIdOrderByCreatedAtDesc(long aLong)
+
+    def RbQuestionnaires findTopByTopicIdOrderByCreatedAtDesc(long aLong)
+
+    def RbQuestionnaires findTopByTopicIdAndIsActiveOrderByCreatedAtDesc(long aLong, String s)
 }
