@@ -48,10 +48,11 @@ class AmazonClient {
             fileUrl = endpointUrl + "/" + childFolder + "/" + fileName
             uploadFileTos3bucket(fileName, file,childFolder)
             file.delete()
+            return fileUrl
         } catch (Exception e) {
             e.printStackTrace()
+            return null
         }
-        return fileUrl;
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {

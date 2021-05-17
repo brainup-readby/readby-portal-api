@@ -18,8 +18,8 @@ readby.mkey: omDHo8wTS!Wi1ayH
 
 amazonProperties:
   endpointUrl: https://readbyicons.s3.ap-south-1.amazonaws.com
-  accessKey:  AKIAUM2PIM5FWGJ5Q4E2
-  secretKey:  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
+  accessKey:  AKIAUM2PIM5F73WABR5M
+  secretKey:  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
   bucketName:  readbyicons
   childFolder: imagesFromAdmin
   questFolder: imagesForQuest

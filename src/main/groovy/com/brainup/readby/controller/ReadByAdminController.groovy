@@ -255,6 +255,21 @@ class ReadByAdminController {
         }
     }
 
+    @GetMapping(value = "/getSubjectListByName")
+    ResponseEntity getSubjectListByNameOrCode(@RequestParam Map<String, String> map) {
+        try {
+            log.info "calling getSubjectList service for admin."
+            List<MasSubjectsDTO> masSubjectsList = adminService.getSubjectListByName(map)
+            ResponseObject responseObject = new ResponseObject()
+            responseObject.data = masSubjectsList
+            ResponseEntity.status(HttpStatus.OK).body(responseObject)
+
+        } catch (Exception e) {
+            log.error " ${e.message}"
+            throw new BadRequestException(e.message)
+        }
+    }
+
     @PostMapping(value = "/addSubjects", consumes = "multipart/form-data", produces = MediaType.TEXT_PLAIN_VALUE)
     ResponseEntity<Object> addSubjects(@RequestParam("file") MultipartFile file, @RequestParam("masSubjects") String masSubjects) {
         try {

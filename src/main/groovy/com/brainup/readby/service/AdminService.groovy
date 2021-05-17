@@ -304,6 +304,10 @@ class AdminService {
     def List<MasSubjectsDTO> getSubjectList() {
 
         List<MasSubjects> masSubjectsList = masSubjectsRepo.findAll()
+        return subjectsDTOList(masSubjectsList)
+    }
+
+    private List<MasSubjectsDTO> subjectsDTOList(List<MasSubjects> masSubjectsList){
         List<MasSubjectsDTO> li = new ArrayList<>()
         for (MasSubjects masSubjects : masSubjectsList) {
             MasSubjectsDTO masSubjectsDTO = new MasSubjectsDTO()
@@ -494,30 +498,7 @@ class AdminService {
         } else {
             masSubjectsList = masSubjectsRepo.findByYearId(map.get("yearId").toLong())
         }
-        List<MasSubjectsDTO> li = new ArrayList<>()
-        for (MasSubjects masSubjects : masSubjectsList) {
-            MasSubjectsDTO masSubjectsDTO = new MasSubjectsDTO()
-            masSubjectsDTO.subjectId = masSubjects.subjectId
-            masSubjectsDTO.subjectName = masSubjects.subjectName
-            masSubjectsDTO.subjectCode = masSubjects.subjectCode
-            masSubjectsDTO.subjectPrice = masSubjects.subjectPrice
-            masSubjectsDTO.iconPath = masSubjects.iconPath
-            masSubjectsDTO.streamId = masSubjects.streamId
-            MasStream masStream = masStreamRepo.findByStreamId(masSubjects.streamId)
-
-            if (masStream.masCourses != null && masStream.masCourses.courseId != null)
-                masSubjectsDTO.courseId = masStream.masCourses.courseId
-
-            masSubjectsDTO.streamName = masStream.streamName
-            masSubjectsDTO.streamCode = masStream.streamCode
-            masSubjectsDTO.yearId = masSubjects.yearId
-            MasCourseYear masCourseYear = masCourseYearRepo.findByYearId(masSubjects.yearId)
-            masSubjectsDTO.year = masCourseYear.year
-            masSubjectsDTO.yearDisplayName = masCourseYear.displayName
-            masSubjectsDTO.isActive = masSubjects.isActive
-            li.add(masSubjectsDTO)
-        }
-        li
+        return subjectsDTOList(masSubjectsList)
     }
 
     def MasStreamLkp addStream(MasStreamLkp masStreamLkp) {
@@ -667,5 +648,10 @@ class AdminService {
             }
         }
         masSubjects1
+    }
+
+    def List<MasSubjectsDTO> getSubjectListByName(Map<String, String> map) {
+        List<MasSubjects> masSubjectsList = masSubjectsRepo.findBySubjectNameContaining(map.get("subName").toString())
+        return subjectsDTOList(masSubjectsList)
     }
 }
